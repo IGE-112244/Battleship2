@@ -7,7 +7,16 @@
 > A modern take on the classic naval warfare game, designed for the XVII century setting with updated software engineering patterns.
 
 ---
-
+## Grupo: TP06-5
+### Curso
+Informática e Gestão de Empresas
+## Membros
+| Número  | Nome              |
+|---------|-------------------|
+| 105498  | Luís Manteigas    |
+| 112244  | Fábio Reis        |
+| 122989  | Carolina Lisboa   |
+| 123022  | Rita Peixoto      |
 NOTA: O repositório foi criado pelo aluno com o número (112244) para que pudessemos dar seguimento ao trabalho em regime PL, uma vez que o regime de diurno não alcançou a parte B durante a sua aula.
 
 ## 📖 Table of Contents
