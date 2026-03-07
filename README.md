@@ -8,6 +8,8 @@
 
 ---
 
+NOTA: O repositório foi criado pelo aluno com o número (112244) para que pudessemos dar seguimento ao trabalho em regime PL, uma vez que o regime de diurno não alcançou a parte B durante a sua aula.
+
 ## 📖 Table of Contents
 - [Project Overview](#-project-overview)
 - [Key Features](#-key-features)
