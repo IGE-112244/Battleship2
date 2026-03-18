@@ -79,7 +79,10 @@ public class Tasks {
 
 						if (game.getRemainingShips() == 0) {
 							game.over();
-							BoardVisualizer.fechar();                                    // fecha a janela
+                            BoardVisualizer.fechar();                                  // fecha a janela
+							String pdfFile = "historico_partida_" + System.currentTimeMillis() + ".pdf";
+							GamePdfExporter.export(game, pdfFile);
+							System.out.println("Histórico exportado para: " + pdfFile);
 							System.exit(0);
 						}
 					}
@@ -97,8 +100,12 @@ public class Tasks {
 								Thread.currentThread().interrupt();
 							}
 						}
+
 						if (game.getRemainingShips() == 0) {
 							game.over();
+							String pdfFile = "historico_partida_" + System.currentTimeMillis() + ".pdf";
+							GamePdfExporter.export(game, pdfFile);
+							System.out.println("Histórico exportado para: " + pdfFile);
 							BoardVisualizer.fechar();                                    // fecha a janela
 							System.exit(0);
 						}
