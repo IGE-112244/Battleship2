@@ -74,6 +74,9 @@ public class Tasks {
 
 						if (game.getRemainingShips() == 0) {
 							game.over();
+							String pdfFile = "historico_partida_" + System.currentTimeMillis() + ".pdf";
+							GamePdfExporter.export(game, pdfFile);
+							System.out.println("Histórico exportado para: " + pdfFile);
 							System.exit(0);
 						}
 					}
@@ -93,6 +96,9 @@ public class Tasks {
 
 						if (game.getRemainingShips() == 0) {
 							game.over();
+							String pdfFile = "historico_partida_" + System.currentTimeMillis() + ".pdf";
+							GamePdfExporter.export(game, pdfFile);
+							System.out.println("Histórico exportado para: " + pdfFile);
 							System.exit(0);
 						}
 					}
