@@ -32,6 +32,7 @@ public class Tasks {
 	private static final String MAPA = "mapa";
 	private static final String STATUS = "estado";
 	private static final String SIMULA = "simula";
+	private static final String RAJADAJSON = "rajadajson";
 	private static final String EXPORTJSON = "exportjson";
 
 	/**
@@ -134,6 +135,27 @@ public class Tasks {
 						System.out.println("Ainda não existe jogo iniciado!");
 					}
 					break;
+				case RAJADAJSON:
+					if (game != null) {
+						((Game) game).readEnemyFireFromJson(in);
+						myFleet.printStatus();
+						game.printMyBoard(true, false);
+						BoardVisualizer.atualizar(myFleet, game.getAlienMoves(), true);
+						if (game.getRemainingShips() == 0) {
+							game.over();
+							BoardVisualizer.fechar();
+							String pdfFile = "historico_partida_" + System.currentTimeMillis() + ".pdf";
+							GamePdfExporter.export(game, pdfFile);
+							String jsonFile = "historico_partida_" + System.currentTimeMillis() + ".json";
+							GameJsonExporter.export(game, jsonFile);
+							//GameStats stats = GameStatsRepository.load();
+							//stats.update(game, true);
+							//GameStatsRepository.save(stats);
+							//GameStatsPanel.mostrar();
+							System.exit(0);
+						}
+					}
+					break;
 				default:
 					System.out.println("Que comando é esse??? Repete ...");
 			}
@@ -155,6 +177,7 @@ public class Tasks {
 		System.out.println("- " + STATUS + ": Mostra o status atual da frota.)");
 		System.out.println("- " + MAPA + ": Exibe o mapa da frota.");
 		System.out.println("- " + RAJADA + ": Realiza uma rajada de disparos.");
+		System.out.println("- " + RAJADAJSON + ": Insere uma rajada em formato JSON (para jogar contra LLM).");
 		System.out.println("- " + SIMULA + ": Simula um jogo completo.");
 		System.out.println("- " + TIROS + ": Lista os tiros válidos realizados (* = tiro em navio, o = tiro na água)");
 		System.out.println("- " + DESISTIR + ": Encerra o jogo.");
