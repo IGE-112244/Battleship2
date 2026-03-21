@@ -73,6 +73,12 @@ Mostra-me o teu Diário de Bordo atual e diz-me qual seria a tua próxima rajada
 
 
 
+
+
+3. Para funcionar é necessário criar uma Variável de Ambiente de nome HF_TOKEN = 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
+
+Importa realçar que devido às limitações da API de IA gratuita o prompt tem de ser mais curto do que o necessário, impossibilitando a IA de atingir todo o seu potencial criando o jogo mais interativo e podendo levar a possíveis erros como jogadas repetidas ou fora do tabuleiro (raramente).
+
 ## 📖 Table of Contents
 - [Project Overview](#-project-overview)
 - [Key Features](#-key-features)
