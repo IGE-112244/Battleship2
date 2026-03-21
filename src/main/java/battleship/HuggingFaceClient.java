@@ -357,4 +357,17 @@ public class HuggingFaceClient {
 
         return text.substring(start, end);
     }
+
+    private static String loadToken() {
+        try {
+            java.util.Properties props = new java.util.Properties();
+            props.load(new java.io.FileReader("config.properties"));
+            String token = props.getProperty("HF_TOKEN");
+            System.out.println("Token carregado: " + token.substring(0, 5) + "...");
+            return token;
+        } catch (Exception e) {
+            System.out.println("Erro ao carregar token: " + e.getMessage());
+            return System.getenv("HF_TOKEN");
+        }
+    }
 }
