@@ -102,7 +102,13 @@
 		<dependency>
 			<groupId>com.squareup.okhttp3</groupId>
 			<artifactId>okhttp</artifactId>
-			<version>4.12.0</version>
+      <version>4.12.0</version>
+    </dependency>
+    
+    <dependency>
+			<groupId>org.knowm.xchart</groupId>
+			<artifactId>xchart</artifactId>
+			<version>3.8.6</version>
 		</dependency>
 	</dependencies>
 

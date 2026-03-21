@@ -32,7 +32,52 @@ As compilações seguintes são mais rápidas porque, na primeira compilação, 
 
 A única exceção são dependências marcadas como SNAPSHOT, que o Maven verifica periodicamente no repositório remoto (por omissão, uma vez por dia) para garantir que a versão de desenvolvimento mais recente é sempre utilizada.
 
+**D.**
 
+2. PROMPT DA ESTRATÉGIA (usámos este prompt após termos ensinado o Gemini com as prompts do enunciado):
+  
+Vamos agora afinar a tua estratégia de jogo com regras adicionais  para jogares como um humano experiente.
+
+FASE 1 - ABERTURA (primeiras 5 rajadas):
+- Começa com um padrão em xadrez (casas alternadas), por exemplo:
+  A1, A3, A5, B2, B4, C1, C3...
+- Este padrão garante que não desperdiças tiros em posições adjacentes a água confirmada, já que nenhum navio pode estar nessas posições.
+- Nunca dispares duas rajadas seguidas na mesma zona do tabuleiro.
+- Divide o tabuleiro em 4 quadrantes (A-E / 1-5, A-E / 6-10, F-J / 1-5, F-J / 6-10) e distribui os tiros pelos quadrantes.
+
+FASE 2 - CAÇA (quando há um acerto sem afundar):
+- Após um acerto, na rajada seguinte dispara nas 4 posições ortogonais (Norte, Sul, Este, Oeste) do acerto.
+- Se confirmares a direção do navio (dois acertos em linha), continua nessa direção até o afundar.
+- Nunca dispares nas diagonais de um acerto — são sempre água (exceto no corpo do Galeão).
+
+FASE 3 - ELIMINAÇÃO (após afundar um navio):
+- Quando afundares um navio, marca todas as posições adjacentes (incluindo diagonais) como água intransitável no teu Diário de Bordo.
+- Retoma o padrão em xadrez nas zonas ainda não exploradas.
+
+REGRAS DE MEMÓRIA OBRIGATÓRIAS:
+- Mantém sempre o teu Diário de Bordo atualizado com:
+  * Tiros na água (○)
+  * Acertos em navios (✕)
+  * Navios afundados e as suas posições exatas
+  * Zonas de exclusão (adjacentes a navios afundados)
+- Nunca repitas um tiro em posição já tentada.
+- Nunca dispares em posições de exclusão.
+
+PRIORIDADE DE ALVOS:
+1. Continuar a caçar um navio já atingido mas não afundado
+2. Explorar zonas do tabuleiro ainda não testadas
+3. Preferir zonas onde ainda cabem navios não encontrados (ex: se só falta o Galeão de 5, não dispares em zonas com menos de 5 posições livres consecutivas)
+
+Confirmas que entendeste estas regras adicionais? 
+Mostra-me o teu Diário de Bordo atual e diz-me qual seria a tua próxima rajada com base nesta estratégia melhorada.
+
+
+
+
+
+3. Para funcionar é necessário criar uma Variável de Ambiente de nome HF_TOKEN = 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
+
+Importa realçar que devido às limitações da API de IA gratuita o prompt tem de ser mais curto do que o necessário, impossibilitando a IA de atingir todo o seu potencial criando o jogo mais interativo e podendo levar a possíveis erros como jogadas repetidas ou fora do tabuleiro (raramente).
 
 ## 📖 Table of Contents
 - [Project Overview](#-project-overview)
