@@ -3,6 +3,7 @@ package battleship;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.*;
 
@@ -439,5 +440,49 @@ public class Game implements IGame
 			System.out.println("+--------------------------------------------------------------+");
 			System.out.println("| Maldito sejas, Java Sparrow, eu voltarei, glub glub glub ... |");
 			System.out.println("+--------------------------------------------------------------+");
+	}
+
+	/**
+	 * Lê uma rajada diretamente em formato JSON (enviado pelo LLM)
+	 * e processa os tiros automaticamente.
+	 *
+	 * @param in o scanner para ler o JSON da consola
+	 * @return o JSON de resposta para enviar ao LLM
+	 */
+	public String readEnemyFireFromJson(Scanner in) {
+
+		System.out.println("Cola aqui o JSON do Gemini (termina com linha vazia):");
+		StringBuilder sb = new StringBuilder();
+		String line;
+		while (!(line = in.nextLine()).isEmpty()) {
+			sb.append(line);
+		}
+
+		ObjectMapper mapper = new ObjectMapper();
+		List<IPosition> shots = new ArrayList<>();
+
+		try {
+			JsonNode root = mapper.readTree(sb.toString());
+			for (JsonNode node : root) {
+				String row = node.get("row").asText();       // ex: "B"
+				int column = node.get("column").asInt();     // ex: 3
+				shots.add(new Position(row.toUpperCase().charAt(0), column));
+			}
+		} catch (Exception e) {
+			throw new RuntimeException("Erro ao ler JSON do Gemini: " + e.getMessage(), e);
+		}
+
+		if (shots.size() != NUMBER_SHOTS) {
+			throw new IllegalArgumentException("O JSON deve conter exatamente " + NUMBER_SHOTS + " tiros.");
+		}
+
+		this.fireShots(shots);
+
+		String jsonResponse = Game.jsonShots(shots);
+		System.out.println("\n--- Resposta para o Gemini ---");
+		System.out.println(jsonResponse);
+		System.out.println("------------------------------\n");
+
+		return jsonResponse;
 	}
 }

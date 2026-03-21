@@ -11,15 +11,20 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Visualização gráfica do tabuleiro com cores usando a biblioteca Lanterna.
- * A janela fica aberta durante todo o jogo e atualiza após cada jogada.
+ * Visualizador gráfico do jogo da Batalha Naval.
+ * Mostra os dois tabuleiros lado a lado:
+ * - Esquerda: o teu tabuleiro (com os ataques da IA)
+ * - Direita:  o tabuleiro da IA (com os teus ataques e resultados conhecidos)
  */
 public class BoardVisualizer {
 
     private static Screen screen = null;
 
+    // Offset horizontal do tabuleiro da IA (à direita)
+    private static final int RIGHT_BOARD_OFFSET = 26;
+
     /**
-     * Inicializa a janela gráfica — chamar apenas uma vez no início do jogo.
+     * Inicializa a janela gráfica.
      */
     public static void iniciar() {
         try {
@@ -32,90 +37,58 @@ public class BoardVisualizer {
     }
 
     /**
-     * Atualiza o tabuleiro na janela gráfica.
+     * Atualiza ambos os tabuleiros na janela gráfica.
      *
-     * @param fleet     a frota do jogador
-     * @param moves     as jogadas realizadas pelo inimigo
-     * @param showShots se true, mostra os tiros recebidos
+     * @param myFleet      a tua frota
+     * @param alienMoves   jogadas da IA (ataques ao teu tabuleiro)
+     * @param myMoves      as tuas jogadas (ataques ao tabuleiro da IA)
+     * @param showShots    se true, mostra os tiros em ambos os tabuleiros
      */
-    public static void atualizar(IFleet fleet, List<IMove> moves, boolean showShots) {
+    public static void atualizar(IFleet myFleet, List<IMove> alienMoves,
+                                 List<IMove> myMoves, boolean showShots) {
         if (screen == null) return;
 
         try {
             screen.clear();
             TextGraphics tg = screen.newTextGraphics();
 
-            // Título
+            // --- Títulos ---
+            tg.setForegroundColor(TextColor.ANSI.YELLOW_BRIGHT);
+            tg.putString(3,  0, "=== O TEU TABULEIRO ===");
+            tg.putString(RIGHT_BOARD_OFFSET + 2, 0, "=== TABULEIRO DA IA ===");
 
-
-            // Cabeçalho das colunas
+            // --- Cabeçalho das colunas ---
             tg.setForegroundColor(TextColor.ANSI.YELLOW);
             tg.putString(2, 1, "1 2 3 4 5 6 7 8 9 10");
+            tg.putString(RIGHT_BOARD_OFFSET + 2, 1, "1 2 3 4 5 6 7 8 9 10");
 
-            // Construir o mapa
-            char[][] map = new char[Game.BOARD_SIZE][Game.BOARD_SIZE];
-            for (int r = 0; r < Game.BOARD_SIZE; r++)
-                for (int c = 0; c < Game.BOARD_SIZE; c++)
-                    map[r][c] = '.';
+            // --- Construir o mapa do teu tabuleiro ---
+            char[][] myMap = buildMyMap(myFleet, alienMoves, showShots);
 
-            // Colocar navios no mapa
-            for (IShip ship : fleet.getShips())
-                for (IPosition pos : ship.getPositions())
-                    map[pos.getRow()][pos.getColumn()] = '#';
+            // --- Construir o mapa do tabuleiro da IA ---
+            char[][] aiMap = buildAiMap(myMoves);
 
-            // Colocar tiros no mapa
-            if (showShots)
-                for (IMove move : moves)
-                    for (IPosition shot : move.getShots())
-                        if (shot.isInside()) {
-                            int r = shot.getRow();
-                            int c = shot.getColumn();
-                            if (map[r][c] == '#')
-                                map[r][c] = '*';
-                            else
-                                map[r][c] = 'o';
-                        }
+            // --- Desenhar ambos os tabuleiros ---
+            drawBoard(tg, myMap,  0,                   true);
+            drawBoard(tg, aiMap, RIGHT_BOARD_OFFSET,   false);
 
-            // Desenhar o mapa com cores
-            for (int row = 0; row < Game.BOARD_SIZE; row++) {
-                tg.setForegroundColor(TextColor.ANSI.YELLOW);
-                char rowLabel = (char) ('A' + row);
-                tg.putString(0, row + 2, String.valueOf(rowLabel));  // só a letra, sem " |"
-                tg.putString(1, row + 2, "|");                        // pipe separado
-
-                for (int col = 0; col < Game.BOARD_SIZE; col++) {
-                    char cell = map[row][col];
-                    int x = 2 + col * 2;  // começa em 2, espaçamento de 2
-                    int y = row + 2;
-
-                    switch (cell) {
-                        case '#':
-                            tg.setForegroundColor(TextColor.ANSI.GREEN);
-                            break;
-                        case '*':
-                            tg.setForegroundColor(TextColor.ANSI.RED);
-                            break;
-                        case 'o':
-                            tg.setForegroundColor(TextColor.ANSI.CYAN);
-                            break;
-                        default:
-                            tg.setForegroundColor(TextColor.ANSI.WHITE);
-                            break;
-                    }
-                    tg.putString(x, y, cell + " ");  // célula + espaço
-                }
-            }
-
-            // Legenda
+            // --- Legenda ---
             int legendaY = Game.BOARD_SIZE + 3;
             tg.setForegroundColor(TextColor.ANSI.GREEN);
-            tg.putString(0, legendaY, "# = navio");
+            tg.putString(0, legendaY,     "# = navio");
             tg.setForegroundColor(TextColor.ANSI.RED);
             tg.putString(0, legendaY + 1, "* = acerto");
             tg.setForegroundColor(TextColor.ANSI.CYAN);
             tg.putString(0, legendaY + 2, "o = tiro na agua");
             tg.setForegroundColor(TextColor.ANSI.WHITE);
             tg.putString(0, legendaY + 3, ". = vazio");
+
+            tg.setForegroundColor(TextColor.ANSI.RED);
+            tg.putString(RIGHT_BOARD_OFFSET, legendaY,     "* = acerto confirmado");
+            tg.setForegroundColor(TextColor.ANSI.CYAN);
+            tg.putString(RIGHT_BOARD_OFFSET, legendaY + 1, "o = tiro na agua");
+            tg.setForegroundColor(TextColor.ANSI.WHITE);
+            tg.putString(RIGHT_BOARD_OFFSET, legendaY + 2, ". = nao explorado");
 
             screen.refresh();
 
@@ -125,7 +98,113 @@ public class BoardVisualizer {
     }
 
     /**
-     * Fecha a janela gráfica — chamar quando o jogo terminar.
+     * Versão simplificada — atualiza apenas o teu tabuleiro (compatibilidade).
+     */
+    public static void atualizar(IFleet myFleet, List<IMove> alienMoves, boolean showShots) {
+        atualizar(myFleet, alienMoves, List.of(), showShots);
+    }
+
+    // -----------------------------------------------------------------------
+    // Construção dos mapas
+    // -----------------------------------------------------------------------
+
+    /**
+     * Constrói o mapa do teu tabuleiro com a tua frota e os ataques da IA.
+     */
+    private static char[][] buildMyMap(IFleet myFleet, List<IMove> alienMoves, boolean showShots) {
+        char[][] map = initMap();
+
+        // Colocar navios
+        for (IShip ship : myFleet.getShips())
+            for (IPosition pos : ship.getPositions())
+                map[pos.getRow()][pos.getColumn()] = '#';
+
+        // Colocar tiros da IA
+        if (showShots)
+            for (IMove move : alienMoves)
+                for (IPosition shot : move.getShots())
+                    if (shot.isInside()) {
+                        int r = shot.getRow();
+                        int c = shot.getColumn();
+                        map[r][c] = (map[r][c] == '#') ? '*' : 'o';
+                    }
+
+        return map;
+    }
+
+    /**
+     * Constrói o mapa do tabuleiro da IA com os resultados conhecidos dos teus tiros.
+     */
+    private static char[][] buildAiMap(List<IMove> myMoves) {
+        char[][] map = initMap();
+
+        for (IMove move : myMoves) {
+            List<IPosition> shots = move.getShots();
+            List<IGame.ShotResult> results = move.getShotResults();
+
+            for (int i = 0; i < shots.size(); i++) {
+                IPosition pos = shots.get(i);
+                if (!pos.isInside()) continue;
+
+                int r = pos.getRow();
+                int c = pos.getColumn();
+
+                if (i < results.size()) {
+                    IGame.ShotResult result = results.get(i);
+                    if (!result.valid() || result.repeated()) continue;
+                    map[r][c] = (result.ship() != null) ? '*' : 'o';
+                }
+            }
+        }
+
+        return map;
+    }
+
+    private static char[][] initMap() {
+        char[][] map = new char[Game.BOARD_SIZE][Game.BOARD_SIZE];
+        for (int r = 0; r < Game.BOARD_SIZE; r++)
+            for (int c = 0; c < Game.BOARD_SIZE; c++)
+                map[r][c] = '.';
+        return map;
+    }
+
+    // -----------------------------------------------------------------------
+    // Desenho do tabuleiro
+    // -----------------------------------------------------------------------
+
+    private static void drawBoard(TextGraphics tg, char[][] map, int xOffset, boolean showShips) {
+        for (int row = 0; row < Game.BOARD_SIZE; row++) {
+            tg.setForegroundColor(TextColor.ANSI.YELLOW);
+            char rowLabel = (char) ('A' + row);
+            tg.putString(xOffset,     row + 2, String.valueOf(rowLabel));
+            tg.putString(xOffset + 1, row + 2, "|");
+
+            for (int col = 0; col < Game.BOARD_SIZE; col++) {
+                char cell = map[row][col];
+                int x = xOffset + 2 + col * 2;
+                int y = row + 2;
+
+                switch (cell) {
+                    case '#':
+                        tg.setForegroundColor(TextColor.ANSI.GREEN);
+                        break;
+                    case '*':
+                        tg.setForegroundColor(TextColor.ANSI.RED);
+                        break;
+                    case 'o':
+                        tg.setForegroundColor(TextColor.ANSI.CYAN);
+                        break;
+                    default:
+                        tg.setForegroundColor(TextColor.ANSI.WHITE);
+                        break;
+                }
+                tg.putString(x, y, cell + " ");
+            }
+        }
+    }
+
+    /**
+     * Fecha a janela gráfica.
      */
     public static void fechar() {
         if (screen != null) {
