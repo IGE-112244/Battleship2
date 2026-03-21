@@ -52,6 +52,8 @@ public class Tasks {
 					myFleet = Fleet.createRandom();
 					game = new Game(myFleet);
 					game.printMyBoard(false, true);
+					BoardVisualizer.iniciar();                                           // abre a janela
+					BoardVisualizer.atualizar(myFleet, game.getAlienMoves(), false);    // mostra tabuleiro inicial
 					break;
 				case LEFROTA:
 					myFleet = buildFleet(in);
@@ -63,17 +65,21 @@ public class Tasks {
 						myFleet.printStatus();
 					break;
 				case MAPA:
-					if (myFleet != null)
+					if (myFleet != null) {
 						game.printMyBoard(false, true);
+						BoardVisualizer.atualizar(myFleet, game.getAlienMoves(), false); // atualiza
+					}
 					break;
 				case RAJADA:
 					if (game != null) {
 						game.readEnemyFire(in);
 						myFleet.printStatus();
 						game.printMyBoard(true, false);
+						BoardVisualizer.atualizar(myFleet, game.getAlienMoves(), true);  // atualiza com tiros
 
 						if (game.getRemainingShips() == 0) {
 							game.over();
+                            BoardVisualizer.fechar();                                  // fecha a janela
 							String pdfFile = "historico_partida_" + System.currentTimeMillis() + ".pdf";
 							GamePdfExporter.export(game, pdfFile);
 							System.out.println("Histórico exportado para: " + pdfFile);
@@ -83,14 +89,15 @@ public class Tasks {
 					break;
 				case SIMULA:
 					if (game != null) {
-						while (game.getRemainingShips() > 0){
+						while (game.getRemainingShips() > 0) {
 							game.randomEnemyFire();
 							myFleet.printStatus();
 							game.printMyBoard(true, false);
+							BoardVisualizer.atualizar(myFleet, game.getAlienMoves(), true); // atualiza a cada jogada
 							try {
 								Thread.sleep(3000);
 							} catch (InterruptedException e) {
-								Thread.currentThread().interrupt(); // Best practice: restore interrupt status
+								Thread.currentThread().interrupt();
 							}
 						}
 
@@ -99,6 +106,7 @@ public class Tasks {
 							String pdfFile = "historico_partida_" + System.currentTimeMillis() + ".pdf";
 							GamePdfExporter.export(game, pdfFile);
 							System.out.println("Histórico exportado para: " + pdfFile);
+							BoardVisualizer.fechar();                                    // fecha a janela
 							System.exit(0);
 						}
 					}
@@ -116,6 +124,7 @@ public class Tasks {
 			System.out.print("> ");
 			command = in.next();
 		}
+		BoardVisualizer.fechar();
 		System.out.println(GOODBYE_MESSAGE);
 	}
 
