@@ -22,6 +22,18 @@ Informática e Gestão de Empresas
 
 NOTA: O repositório foi criado pelo aluno com o número (112244) para que pudessemos dar seguimento ao trabalho em regime PL, uma vez que o regime de diurno não alcançou a parte B durante a sua aula.
 
+## Respostas à Ficha 2:
+
+**B.**
+
+2. O Maven descobre as dependências transitivas através de um processo recursivo de leitura de ficheiros pom.xml das dependências diretas, ou seja, quando declaramos uma dependência direta no  pom.xml, o Maven vai ao repositório buscar não só o .jar dessa biblioteca, mas também o seu pom.xml. Esse ficheiro declara por sua vez as dependências daquela biblioteca (que para o nosso projeto são transitivas). O Maven repete este processo para cada nova dependência encontrada, até esgotar toda a árvore, gerindo automaticamente duplicados que possam surgir por caminhos diferentes.
+   
+As compilações seguintes são mais rápidas porque, na primeira compilação, o Maven descarrega todas as dependências (diretas e transitivas) do repositório central remoto para o repositório local, o que envolve transferências, naturalmente lentas. Nas compilações seguintes, o Maven verifica primeiro o repositório local e, como as dependências já lá estão, não precisa de as voltar a descarregar, acedendo diretamente às cópias locais, sendo o acesso ao disco substancialmente mais rápido do que as transferências.
+
+A única exceção são dependências marcadas como SNAPSHOT, que o Maven verifica periodicamente no repositório remoto (por omissão, uma vez por dia) para garantir que a versão de desenvolvimento mais recente é sempre utilizada.
+
+
+
 ## 📖 Table of Contents
 - [Project Overview](#-project-overview)
 - [Key Features](#-key-features)
