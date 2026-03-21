@@ -32,6 +32,7 @@ public class Tasks {
 	private static final String MAPA = "mapa";
 	private static final String STATUS = "estado";
 	private static final String SIMULA = "simula";
+	private static final String EXPORTJSON = "exportjson";
 
 	/**
 	 * This task also tests the fighting element of a round of three shots
@@ -83,6 +84,9 @@ public class Tasks {
 							String pdfFile = "historico_partida_" + System.currentTimeMillis() + ".pdf";
 							GamePdfExporter.export(game, pdfFile);
 							System.out.println("Histórico exportado para: " + pdfFile);
+							String jsonFile = "historico_partida_" + System.currentTimeMillis() + ".json";
+							GameJsonExporter.export(game, jsonFile);
+							System.out.println("Histórico exportado para: " + jsonFile);
 							System.exit(0);
 						}
 					}
@@ -106,6 +110,9 @@ public class Tasks {
 							String pdfFile = "historico_partida_" + System.currentTimeMillis() + ".pdf";
 							GamePdfExporter.export(game, pdfFile);
 							System.out.println("Histórico exportado para: " + pdfFile);
+							String jsonFile = "historico_partida_" + System.currentTimeMillis() + ".json";
+							GameJsonExporter.export(game, jsonFile);
+							System.out.println("Histórico exportado para: " + jsonFile);
 							BoardVisualizer.fechar();                                    // fecha a janela
 							System.exit(0);
 						}
@@ -118,6 +125,15 @@ public class Tasks {
                 case AJUDA:
                     menuHelp();
                     break;
+				case EXPORTJSON:
+					if (game != null) {
+						String jsonFile = "historico_partida_" + System.currentTimeMillis() + ".json";
+						GameJsonExporter.export(game, jsonFile);
+						System.out.println("Histórico exportado para: " + jsonFile);
+					} else {
+						System.out.println("Ainda não existe jogo iniciado!");
+					}
+					break;
 				default:
 					System.out.println("Que comando é esse??? Repete ...");
 			}
@@ -142,6 +158,7 @@ public class Tasks {
 		System.out.println("- " + SIMULA + ": Simula um jogo completo.");
 		System.out.println("- " + TIROS + ": Lista os tiros válidos realizados (* = tiro em navio, o = tiro na água)");
 		System.out.println("- " + DESISTIR + ": Encerra o jogo.");
+		System.out.println("- " + EXPORTJSON + ": Exporta o histórico da partida para JSON.");
 		System.out.println("===============================================================");
 	}
 	/**
