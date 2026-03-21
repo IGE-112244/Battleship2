@@ -169,10 +169,10 @@ public class Tasks {
 							GamePdfExporter.export(game, pdfFile);
 							String jsonFile = "historico_partida_" + System.currentTimeMillis() + ".json";
 							GameJsonExporter.export(game, jsonFile);
-							//GameStats stats = GameStatsRepository.load();
-							//stats.update(game, true);
-							//GameStatsRepository.save(stats);
-							//GameStatsPanel.mostrar();
+							GameStats stats = GameStatsRepository.load();
+							stats.update(game, true);
+							GameStatsRepository.save(stats);
+							GameStatsPanel.mostrar();
 							System.exit(0);
 						}
 					}
@@ -336,7 +336,7 @@ public class Tasks {
 
 						game.over();
 						BoardVisualizer.fechar();
-						//exportAndSaveStats(game);
+						exportAndSaveStats(game);
 						System.exit(0);
 					}
 				case STATS:
@@ -354,6 +354,22 @@ public class Tasks {
 		}
 		BoardVisualizer.fechar();
 		System.out.println(GOODBYE_MESSAGE);
+	}
+
+	private static void exportAndSaveStats(IGame game) {
+
+			String pdfFile  = "historico_partida_" + System.currentTimeMillis() + ".pdf";
+			String jsonFile = "historico_partida_" + System.currentTimeMillis() + ".json";
+			GamePdfExporter.export(game, pdfFile);
+			System.out.println("Histórico PDF exportado para: " + pdfFile);
+			GameJsonExporter.export(game, jsonFile);
+			System.out.println("Histórico JSON exportado para: " + jsonFile);
+			GameStats stats = GameStatsRepository.load();
+			stats.update(game, game.getRemainingShips() == 0);
+			GameStatsRepository.save(stats);
+			System.out.println("Estatísticas guardadas.");
+			GameStatsPanel.mostrar();
+
 	}
 
 	/**
