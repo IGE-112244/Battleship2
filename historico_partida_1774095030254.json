@@ -1,0 +1,131 @@
+{
+  "data" : "21/03/2026 12:10",
+  "resumo" : {
+    "totalJogadas" : 29,
+    "acertos" : 25,
+    "naviosAfundados" : 11,
+    "naviosRestantes" : 0,
+    "tirosInvalidos" : 0,
+    "tirosRepetidos" : 2,
+    "tirosPorJogada" : 3,
+    "tamanhoTabuleiro" : "10x10"
+  },
+  "jogadasInimigo" : [ {
+    "numero" : 1,
+    "tiros" : [ "G10", "J9", "F3" ],
+    "resultado" : "1 acerto(s) | 2 água"
+  }, {
+    "numero" : 2,
+    "tiros" : [ "G5", "D10", "F2" ],
+    "resultado" : "3 água"
+  }, {
+    "numero" : 3,
+    "tiros" : [ "C3", "C2", "B9" ],
+    "resultado" : "1 acerto(s) | 2 água"
+  }, {
+    "numero" : 4,
+    "tiros" : [ "E4", "F4", "J10" ],
+    "resultado" : "1 acerto(s) [Caravela ao fundo] | 2 água"
+  }, {
+    "numero" : 5,
+    "tiros" : [ "H6", "H7", "G7" ],
+    "resultado" : "3 água"
+  }, {
+    "numero" : 6,
+    "tiros" : [ "I7", "E9", "D7" ],
+    "resultado" : "3 água"
+  }, {
+    "numero" : 7,
+    "tiros" : [ "B7", "I4", "D3" ],
+    "resultado" : "3 água"
+  }, {
+    "numero" : 8,
+    "tiros" : [ "I2", "H8", "A9" ],
+    "resultado" : "2 acerto(s) [Barca ao fundo] | 1 água"
+  }, {
+    "numero" : 9,
+    "tiros" : [ "A3", "E7", "F1" ],
+    "resultado" : "3 água"
+  }, {
+    "numero" : 10,
+    "tiros" : [ "J1", "A7", "I3" ],
+    "resultado" : "1 acerto(s) | 2 água"
+  }, {
+    "numero" : 11,
+    "tiros" : [ "E8", "A1", "F6" ],
+    "resultado" : "1 acerto(s) | 2 água"
+  }, {
+    "numero" : 12,
+    "tiros" : [ "D1", "D4", "C6" ],
+    "resultado" : "1 acerto(s) | 2 água"
+  }, {
+    "numero" : 13,
+    "tiros" : [ "F9", "J2", "C1" ],
+    "resultado" : "2 acerto(s) | 1 água"
+  }, {
+    "numero" : 14,
+    "tiros" : [ "B3", "F10", "J4" ],
+    "resultado" : "3 água"
+  }, {
+    "numero" : 15,
+    "tiros" : [ "H3", "E10", "G2" ],
+    "resultado" : "3 água"
+  }, {
+    "numero" : 16,
+    "tiros" : [ "B1", "A2", "F7" ],
+    "resultado" : "2 acerto(s) | 1 água"
+  }, {
+    "numero" : 17,
+    "tiros" : [ "A5", "J5", "H5" ],
+    "resultado" : "3 água"
+  }, {
+    "numero" : 18,
+    "tiros" : [ "A4", "C5", "J7" ],
+    "resultado" : "1 acerto(s) | 2 água"
+  }, {
+    "numero" : 19,
+    "tiros" : [ "F5", "I6", "E3" ],
+    "resultado" : "1 acerto(s) | 2 água"
+  }, {
+    "numero" : 20,
+    "tiros" : [ "C4", "H4", "E2" ],
+    "resultado" : "1 acerto(s) [Barca ao fundo] | 2 água"
+  }, {
+    "numero" : 21,
+    "tiros" : [ "B10", "A8", "D8" ],
+    "resultado" : "3 água"
+  }, {
+    "numero" : 22,
+    "tiros" : [ "H2", "G4", "E6" ],
+    "resultado" : "1 acerto(s) [Barca ao fundo] | 2 água"
+  }, {
+    "numero" : 23,
+    "tiros" : [ "H1", "C8", "D9" ],
+    "resultado" : "1 acerto(s) [Barca ao fundo] | 2 água"
+  }, {
+    "numero" : 24,
+    "tiros" : [ "F8", "B4", "C7" ],
+    "resultado" : "2 acerto(s) [Fragata ao fundo] | 1 água"
+  }, {
+    "numero" : 25,
+    "tiros" : [ "A10", "C10", "C9" ],
+    "resultado" : "1 acerto(s) [Caravela ao fundo] | 2 água"
+  }, {
+    "numero" : 26,
+    "tiros" : [ "B5", "D6", "D5" ],
+    "resultado" : "3 água"
+  }, {
+    "numero" : 27,
+    "tiros" : [ "I5", "B2", "A6" ],
+    "resultado" : "2 acerto(s) [Nau ao fundo] | 1 água"
+  }, {
+    "numero" : 28,
+    "tiros" : [ "J6", "H10", "J3" ],
+    "resultado" : "2 acerto(s) [Caravela, Nau ao fundo] | 1 água"
+  }, {
+    "numero" : 29,
+    "tiros" : [ "B6", "B6", "B6" ],
+    "resultado" : "1 acerto(s) [Galeao ao fundo] | 2 repetido(s)"
+  } ],
+  "minhasJogadas" : [ ]
+}
