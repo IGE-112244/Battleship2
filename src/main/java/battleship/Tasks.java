@@ -33,6 +33,8 @@ public class Tasks {
 	private static final String STATUS = "estado";
 	private static final String SIMULA = "simula";
 	private static final String EXPORTJSON = "exportjson";
+	private static final String STATS = "stats";
+	private static final String RESETSTATS = "resetstats";
 
 	/**
 	 * This task also tests the fighting element of a round of three shots
@@ -87,6 +89,12 @@ public class Tasks {
 							String jsonFile = "historico_partida_" + System.currentTimeMillis() + ".json";
 							GameJsonExporter.export(game, jsonFile);
 							System.out.println("Histórico exportado para: " + jsonFile);
+
+							GameStats stats = GameStatsRepository.load();
+							stats.update(game, true); // true = jogador ganhou
+							GameStatsRepository.save(stats);
+							GameStatsPanel.mostrar();
+
 							System.exit(0);
 						}
 					}
@@ -114,6 +122,12 @@ public class Tasks {
 							GameJsonExporter.export(game, jsonFile);
 							System.out.println("Histórico exportado para: " + jsonFile);
 							BoardVisualizer.fechar();                                    // fecha a janela
+
+							GameStats stats = GameStatsRepository.load();
+							stats.update(game, true); // true = jogador ganhou
+							GameStatsRepository.save(stats);
+							GameStatsPanel.mostrar();
+
 							System.exit(0);
 						}
 					}
@@ -133,6 +147,13 @@ public class Tasks {
 					} else {
 						System.out.println("Ainda não existe jogo iniciado!");
 					}
+					break;
+				case STATS:
+					GameStatsPanel.mostrar();
+					break;
+
+				case RESETSTATS:
+					GameStatsRepository.reset();
 					break;
 				default:
 					System.out.println("Que comando é esse??? Repete ...");
@@ -158,6 +179,8 @@ public class Tasks {
 		System.out.println("- " + SIMULA + ": Simula um jogo completo.");
 		System.out.println("- " + TIROS + ": Lista os tiros válidos realizados (* = tiro em navio, o = tiro na água)");
 		System.out.println("- " + DESISTIR + ": Encerra o jogo.");
+		System.out.println("- " + STATS + ": Mostra o painel de estatísticas.");
+		System.out.println("- " + RESETSTATS + ": Apaga todas as estatísticas.");
 		System.out.println("- " + EXPORTJSON + ": Exporta o histórico da partida para JSON.");
 		System.out.println("===============================================================");
 	}
