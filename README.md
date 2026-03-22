@@ -80,7 +80,7 @@ Mostra-me o teu Diário de Bordo atual e diz-me qual seria a tua próxima rajada
 
 3. Para funcionar é necessário criar uma Variável de Ambiente de nome HF_TOKEN = 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
 
-Importa realçar que devido às limitações da API de IA gratuita o prompt tem de ser mais curto do que o necessário, impossibilitando a IA de atingir todo o seu potencial criando o jogo mais interativo e podendo levar a possíveis erros como jogadas repetidas ou fora do tabuleiro (raramente). Eventualmente, aparecia este erro:
+Importa realçar que devido às limitações da API de IA gratuita o prompt tem de ser mais curto do que o necessário, impossibilitando a IA de atingir todo o seu potencial criando o jogo mais interativo e podendo levar a possíveis erros como jogadas repetidas ou fora do tabuleiro (raramente). Como é necessário informar a IA das jogadas que já e se foi ou não um tiro certeiro e o tipo de barco, quanto mais jogadas são feitas maior é o tamanho da prompt enviada, levando a que, eventualmente, possa aparecer o seguinte erro:
 
 Exception in thread "main" java.lang.RuntimeException: Erro na API do Hugging Face: 400 - 
 Detalhes: {"message":"Please reduce the length of the messages or completion. Current length is 8677 while limit is 8192","type":"invalid_request_error","param":"messages","code":"context_length_exceeded","id":""}
