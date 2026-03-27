@@ -89,6 +89,89 @@ Detalhes: {"message":"Please reduce the length of the messages or completion. Cu
 	at battleship.Tasks.menu(Tasks.java:217)
 	at battleship.Main.main(Main.java:24)
 
+## Respostas à Ficha 3
+
+Tarefa 1. 
+
+B)
+
+2. Análise dos resultados da inspeção de código:
+
+**Security**
+Foram detetados 4 warnings e 1 weak warning:
+
+Link with unencrypted protocol, o ficheiro jqueryUI.md usa HTTP em vez de HTTPS
+Vulnerable declared dependency, o pom.xml declara dependências com vulnerabilidades conhecidas, nomeadamente o log4j-core:2.20.0 (CVE associada à Log4Shell), com dependências transitivas vulneráveis adicionais como jackson-core e commons
+
+**Java**
+Foram detetados 125 warnings e 10 weak warnings, distribuídos por 11 subcategorias. As mais relevantes são:
+
+Java language level migration aids (40),  código que pode ser modernizado para versões mais recentes do Java
+Declaration redundancy (35), variáveis, métodos ou imports declarados mas não utilizados
+Probable bugs (14), código com potencial para erros em runtime, merece atenção prioritária
+Code style issues (12), violações de convenções de escrita
+Restantes categorias com menor expressão: Javadoc (7), Imports (6), Test frameworks (5), Code maturity (3), Performance (2), e Threading issues (1)
+
+Em suma, as categorias mais críticas são as dependências vulneráveis em Security e os Probable bugs em Java, por terem maior impacto potencial na fiabilidade e segurança do sistema.
+
+
+3. Através do Qodana, verificamos ainda, entre outras, as seguintes inconsistências:
+
+**Security**: 4 problemas no pom.xml
+A análise Qodana identificou vulnerabilidades mais detalhadas que a inspeção manual:
+
+log4j-core:2.20.0 — CVE-2025-68161, severidade 5.4 (Insufficient Information) — dependência direta vulnerável
+jackson-core:2.15.2 — GHSA-72hv-8253-57qq, severidade 7.5 (Insufficient Information) — dependência transitiva
+classgraph:4.6.18 — CVE-2021-47621, severidade 7.5 (Improper Restriction of XML External Entity Reference — XXE) — dependência transitiva particularmente grave pois ataques XXE permitem leitura de ficheiros internos do servidor
+commons-lang3:3.15.0 — CVE-2025-48924, severidade 5.3 — dependência transitiva
+
+**Threading issues**: 1 problema
+Detetado um problema de concorrência no código, que merece atenção especial pois erros de threading são difíceis de reproduzir e depurar.
+
+O Qodana fornece uma análise mais detalhada que a inspeção manual, identificando os CVEs e severidades exatas de cada vulnerabilidade. A mais grave é a do classgraph (XXE, 7.5) por ser explorável remotamente. A solução passa por atualizar estas dependências para versões sem vulnerabilidades conhecidas no pom.xml.
+
+
+
+4. O ficheiro de configuração do Qodana tem os seguintes elementos relevantes:
+5. 
+Perfil de inspeção:
+
+yamlprofile:
+  name: qodana.starter
+Usa o perfil qodana.starter, o perfil básico/inicial do Qodana.
+
+JDK configurado:
+yamlprojectJDK: "25"
+Usa o Java 25, o que é consistente com o projeto.
+
+Linter:
+yamllinter: jetbrains/qodana-jvm:2025.3
+Usa o linter específico para JVM, adequado para projetos Java como o Battleship2.
+
+Quality Gates — desativados:
+yaml#failureConditions:
+
+severityThresholds:
+any: 15
+critical: 5
+
+Os quality gates estão comentados, o que significa que o pipeline CI/CD nunca falha por problemas de qualidade. Para a Tarefa 2 (onde criámos quality gates com GitHub Actions) foi necessário ativar e configurar estas condições, definindo limiares adequados para as severidades dos problemas detetados.
+
+Aspetos não configurados:
+As secções include/exclude (para ativar/desativar inspeções específicas), bootstrap (scripts de preparação) e plugins estão todas comentadas, indicando uma configuração mínima por omissão.
+
+5. O relatório gerado pelo Qodana identificou um total de 18 problemas distribuídos por 5 ficheiros do projeto, organizados nas categorias Probable Bugs, Security, Performance e Threading Issues.
+
+A categoria com maior expressão é a de Probable Bugs, com ocorrências em três ficheiros distintos. O ficheiro Ship.java concentra a maioria dos problemas, com oito ocorrências no total: duas relacionadas com variáveis que recebem um valor que já detinham, constituindo código redundante, e seis casos de indentação suspeita após instruções if sem chavetas delimitadoras. Este último tipo de problema é particularmente insidioso, uma vez que a formatação visual do código sugere que determinadas instruções fazem parte de um bloco condicional quando na realidade não fazem, podendo originar comportamentos inesperados difíceis de diagnosticar. No ficheiro Game.java foi identificada uma inicialização redundante de uma variável a null, e no HuggingFaceClient.java foi detetado um risco de NullPointerException em tempo de execução.
+
+Relativamente à categoria Security, foram identificadas quatro vulnerabilidades no pom.xml, já detalhadas no ponto anterior, associadas a dependências diretas e transitivas com CVEs conhecidas.
+
+Na categoria Performance, o ficheiro Game.java apresenta duas ocorrências do uso de removeAll sobre um Set passando uma List como argumento, operação com complexidade O(n²) que poderia ser otimizada convertendo previamente a lista para um conjunto.
+
+Na categoria Threading Issues, o ficheiro Tasks.java contém uma chamada a Thread.sleep() dentro de um ciclo, padrão conhecido como espera ativa, que representa uma utilização ineficiente de recursos do sistema e deveria ser substituído por mecanismos de sincronização mais adequados.
+
+Em síntese, o ficheiro mais problemático é o Ship.java, e o problema de maior criticidade para a estabilidade do sistema é o potencial NullPointerException no HuggingFaceClient.java. Estes resultados evidenciam a importância da análise estática de código como complemento ao processo de desenvolvimento, permitindo identificar problemas que poderiam passar despercebidos numa revisão manual.
+
 ## 📖 Table of Contents
 - [Project Overview](#-project-overview)
 - [Key Features](#-key-features)
