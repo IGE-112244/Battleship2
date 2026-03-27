@@ -23,10 +23,10 @@ jobs:
         with:
           fetch-depth: 0  # necessário para análise completa do histórico
 
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
+      - name: Set up JDK 25
+        uses: actions/setup-java@v5
         with:
-          java-version: '21'
+          java-version: '25'
           distribution: 'temurin'
           cache: 'maven'
 
@@ -62,7 +62,7 @@ jobs:
           
           linter: jetbrains/qodana-jvm:2024.3
           
-          projectJDK: "17"
+          projectJDK: "25"
           
           # Quality Gate: falha se encontrar instâncias de Long Method
           failureConditions:
