@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -108,36 +111,34 @@ public class Tasks {
 					}
 					break;
 				case SIMULA:
+
 					if (game != null) {
-						while (game.getRemainingShips() > 0) {
-							game.randomEnemyFire();
-							myFleet.printStatus();
-							game.printMyBoard(true, false);
-							BoardVisualizer.atualizar(myFleet, game.getAlienMoves(), true); // atualiza a cada jogada
-							try {
-								Thread.sleep(3000);
-							} catch (InterruptedException e) {
-								Thread.currentThread().interrupt();
+						ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+
+						IFleet finalMyFleet = myFleet;
+						IGame finalGame = game;
+						Runnable simulationStep = new Runnable() {
+							@Override
+							public void run() {
+								if (finalGame.getRemainingShips() > 0) {
+									// Jogo em curso — disparar rajada aleatória
+									finalGame.randomEnemyFire();
+									finalMyFleet.printStatus();
+									finalGame.printMyBoard(true, false);
+									BoardVisualizer.atualizar(finalMyFleet, finalGame.getAlienMoves(), true);
+								} else {
+									// Jogo terminado — exportar e terminar
+									executor.shutdown();
+									finalGame.over();
+									BoardVisualizer.fechar();
+									exportAndSaveStats(finalGame);
+									System.exit(0);
+								}
 							}
-						}
+						};
 
-						if (game.getRemainingShips() == 0) {
-							game.over();
-							String pdfFile = "historico_partida_" + System.currentTimeMillis() + ".pdf";
-							GamePdfExporter.export(game, pdfFile);
-							System.out.println("Histórico exportado para: " + pdfFile);
-							String jsonFile = "historico_partida_" + System.currentTimeMillis() + ".json";
-							GameJsonExporter.export(game, jsonFile);
-							System.out.println("Histórico exportado para: " + jsonFile);
-							BoardVisualizer.fechar();                                    // fecha a janela
-
-							GameStats stats = GameStatsRepository.load();
-							stats.update(game, true); // true = jogador ganhou
-							GameStatsRepository.save(stats);
-							GameStatsPanel.mostrar();
-
-							System.exit(0);
-						}
+						// Executa de 3 em 3 segundos sem busy-waiting
+						executor.scheduleAtFixedRate(simulationStep, 0, 3, TimeUnit.SECONDS);
 					}
 					break;
 				case TIROS:

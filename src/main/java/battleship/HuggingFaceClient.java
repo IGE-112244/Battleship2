@@ -233,7 +233,11 @@ public class HuggingFaceClient {
 
             try (Response response = httpClient.newCall(request).execute()) {
                 // Lê SEMPRE o body, mesmo em caso de erro
-                String body = response.body().string();
+                ResponseBody responseBody = response.body();
+                if (responseBody == null) {
+                    throw new RuntimeException("Resposta da API sem corpo (body null)");
+                }
+                String body = responseBody.string();
 
                 if (!response.isSuccessful()) {
                     throw new RuntimeException("Erro na API do Hugging Face: "
