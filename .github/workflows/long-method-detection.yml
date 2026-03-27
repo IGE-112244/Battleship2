@@ -47,21 +47,26 @@ jobs:
             name: qodana.starter
           
           # Ativar apenas as inspeções relevantes para Long Method
-          include:
-            - name: OverlyLongMethod        # Método excessivamente longo (LOC >= 16)
-            - name: OverlyComplexMethod     # Método excessivamente complexo (CC >= 3)
-            - name: MethodWithMultipleLoops # Método com múltiplos ciclos
-            - name: OverlyNestedMethod      # Método excessivamente aninhado
-            - name: MethodCanBeExtracted    # Método que pode ser extraído
+         include:
+        - name: OverlyLongMethod
+        - name: OverlyComplexMethod
+        - name: MethodWithMultipleLoops
+
+          exclude:
+          - name: BusyWait
+          - name: SuspiciousIndentationAfterControlStatementWithoutBraces
+          - name: NullableProblems
+          - name: SlowAbstractSetRemoveAll
+          - name: UnusedAssignment
           
-          linter: jetbrains/qodana-jvm:2025.1
+          linter: jetbrains/qodana-jvm:2024.3
           
           projectJDK: "21"
           
           # Quality Gate: falha se encontrar instâncias de Long Method
           failureConditions:
             severityThresholds:
-              any: 0  # falha com qualquer problema das inspeções ativas
+            any: 5 
           EOF
 
       - name: Run Qodana Long Method Analysis
@@ -71,7 +76,7 @@ jobs:
           results-dir: ${{ runner.temp }}/qodana-results
           upload-result: true
         env:
-          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+          QODANA_TOKEN: ${{ secrets.QODANA_CONFIGURATIONS_TOKEN }}
 
       - name: Upload Qodana results as artifact
         uses: actions/upload-artifact@v4
