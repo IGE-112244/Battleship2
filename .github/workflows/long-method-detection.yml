@@ -1,0 +1,106 @@
+# IGE-112244 - Fábio Reis
+# Quality Gate: Deteção do code smell "Long Method" (Fowler)
+# Critério: LOC >= 16 e CC >= 3 (Object-Oriented Metrics in Practice, Lanza & Marinescu)
+# Ferramenta: Qodana for JVM
+
+name: Long Method Detection - Quality Gate
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch: # permite execução manual
+
+jobs:
+  long-method-detection:
+    name: Detect Long Method Code Smell
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # necessário para análise completa do histórico
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Cache Maven dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Create Qodana configuration for Long Method detection
+        run: |
+          cat > qodana-longmethod.yaml << 'EOF'
+          version: "1.0"
+          
+          # Perfil focado na deteção do code smell Long Method
+          profile:
+            name: qodana.starter
+          
+          # Ativar apenas as inspeções relevantes para Long Method
+          include:
+            - name: OverlyLongMethod        # Método excessivamente longo (LOC >= 16)
+            - name: OverlyComplexMethod     # Método excessivamente complexo (CC >= 3)
+            - name: MethodWithMultipleLoops # Método com múltiplos ciclos
+            - name: OverlyNestedMethod      # Método excessivamente aninhado
+            - name: MethodCanBeExtracted    # Método que pode ser extraído
+          
+          linter: jetbrains/qodana-jvm:2025.1
+          
+          projectJDK: "21"
+          
+          # Quality Gate: falha se encontrar instâncias de Long Method
+          failureConditions:
+            severityThresholds:
+              any: 0  # falha com qualquer problema das inspeções ativas
+          EOF
+
+      - name: Run Qodana Long Method Analysis
+        uses: JetBrains/qodana-action@v2024.3
+        with:
+          args: --config,qodana-longmethod.yaml
+          results-dir: ${{ runner.temp }}/qodana-results
+          upload-result: true
+        env:
+          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+
+      - name: Upload Qodana results as artifact
+        uses: actions/upload-artifact@v4
+        if: always()  # guardar resultados mesmo se o quality gate falhar
+        with:
+          name: long-method-report
+          path: ${{ runner.temp }}/qodana-results
+          retention-days: 30
+
+      - name: Summary Report
+        if: always()
+        run: |
+          echo "## 🔍 Long Method Detection Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Critérios utilizados (Object-Oriented Metrics in Practice)" >> $GITHUB_STEP_SUMMARY
+          echo "| Métrica | Limiar | Descrição |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|--------|-----------|" >> $GITHUB_STEP_SUMMARY
+          echo "| LOC | ≥ 16 | Lines of Code por método |" >> $GITHUB_STEP_SUMMARY
+          echo "| CC  | ≥ 3  | McCabe Cyclomatic Complexity |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Inspeções Qodana ativas" >> $GITHUB_STEP_SUMMARY
+          echo "- **OverlyLongMethod**: Métodos com LOC excessivo" >> $GITHUB_STEP_SUMMARY
+          echo "- **OverlyComplexMethod**: Métodos com CC elevada" >> $GITHUB_STEP_SUMMARY
+          echo "- **MethodWithMultipleLoops**: Métodos com múltiplos ciclos" >> $GITHUB_STEP_SUMMARY
+          echo "- **OverlyNestedMethod**: Métodos com aninhamento excessivo" >> $GITHUB_STEP_SUMMARY
+          echo "- **MethodCanBeExtracted**: Métodos candidatos a extração" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Refatorações sugeridas (Fowler)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Extract Method**: Decompor o método em métodos mais pequenos" >> $GITHUB_STEP_SUMMARY
+          echo "- **Replace Temp with Query**: Eliminar variáveis temporárias" >> $GITHUB_STEP_SUMMARY
+          echo "- **Introduce Parameter Object**: Reduzir lista de parâmetros" >> $GITHUB_STEP_SUMMARY
+          echo "- **Decompose Conditional**: Simplificar condicionais complexas" >> $GITHUB_STEP_SUMMARY
