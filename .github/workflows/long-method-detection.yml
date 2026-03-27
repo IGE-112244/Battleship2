@@ -62,7 +62,7 @@ jobs:
           
           linter: jetbrains/qodana-jvm:2024.3
           
-          projectJDK: "21"
+          projectJDK: "17"
           
           # Quality Gate: falha se encontrar instâncias de Long Method
           failureConditions:
