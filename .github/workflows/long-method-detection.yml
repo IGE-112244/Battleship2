@@ -76,7 +76,7 @@ jobs:
           results-dir: ${{ runner.temp }}/qodana-results
           upload-result: true
         env:
-          QODANA_TOKEN: ${{ secrets.QODANA_CONFIGURATIONS_TOKEN }}
+          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_740574030 }}
 
       - name: Upload Qodana results as artifact
         uses: actions/upload-artifact@v4
