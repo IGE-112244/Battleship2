@@ -3,6 +3,7 @@
 # Critério: LOC >= 16 e CC >= 3 (Object-Oriented Metrics in Practice, Lanza & Marinescu)
 # Ferramenta: Qodana for JVM
 
+
 name: Long Method Detection - Quality Gate
 
 on:
