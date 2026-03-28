@@ -203,6 +203,21 @@ Os cheiros no código têm como razão de ser comum a violação de princípios 
 
 Em síntese, nem todos os cheiros do catálogo de Fowler possuem uma formalização quantitativa direta, cheiros como Comments, Lazy Class ou Speculative Generality dependem mais de julgamento humano do que de métricas objetivas. Os cheiros mais bem formalizados são precisamente os que têm expressão estrutural clara no código, como o tamanho de métodos e classes, o acoplamento entre objetos e a distribuição de responsabilidades, tornando-os passíveis de deteção automática por ferramentas como o Qodana ou o MetricsTree.
 
+**5 - 112244-Fábio Reis**
+
+O workflow de deteção do code smell Long Method foi implementado com sucesso no repositório BattleShip2, utilizando o Qodana for JVM através do GitHub Actions. O quality gate foi configurado com base nos critérios quantitativos propostos por Lanza e Marinescu no livro Object-Oriented Metrics in Practice, nomeadamente LOC ≥ 16 e CC ≥ 3.
+
+Após a execução do workflow, o Qodana detetou 67 instâncias do code smell Long Method distribuídas pelo projeto, todas com severidade High. O quality gate falhou por exceder o limiar definido de 5 problemas, confirmando a presença generalizada deste code smell. Os casos mais graves identificados foram o método menu() da classe Tasks.java, com 210 linhas de código e complexidade ciclomática de 52, e o método processEnemyFire() da classe Move.java, com 77 linhas e complexidade ciclomática de 37. Estes valores excedem largamente os limiares definidos, confirmando que a parametrização inicial sugerida pelo livro se revelou adequada para o projeto, não sendo necessário ajustá-la. O relatório completo foi disponibilizado no Qodana Cloud e o workflow YAML foi carregado no repositório com o meu número de aluno e nome na primeira linha, conforme solicitado.
+
+**B**
+**6 - 112244-Fábio Reis**
+
+Para verificar o correto funcionamento do workflow de análise com SonarQube Cloud, foi introduzido intencionalmente um bug de fiabilidade no código, concretamente um acesso a um índice inválido de um array (array[10] num array de dimensão 5), garantidamente causador de um ArrayIndexOutOfBoundsException em runtime.
+
+Após fazer push desta alteração para o branch main, o workflow SonarQube Cloud Analysis disparou automaticamente, tal como configurado. O SonarQube analisou o projeto e detetou o bug introduzido na categoria Reliability, fazendo falhar o Quality Gate com a mensagem QUALITY GATE STATUS: FAILED. Este resultado confirma que o pipeline de integração contínua está a funcionar corretamente, qualquer push para o branch main que introduza problemas de qualidade é automaticamente detetado e sinalizado antes de poder comprometer a integridade do projeto.
+
+Após a verificação, o erro intencional foi revertido através de um novo commit, e o workflow voltou a executar, confirmando o restabelecimento do estado anterior do projeto. Esta experiência demonstra na prática o valor da integração de ferramentas de análise estática de qualidade em pipelines de CI/CD, permitindo detetar e corrigir problemas de qualidade de forma contínua e automatizada.
+
 ## 📖 Table of Contents
 - [Project Overview](#-project-overview)
 - [Key Features](#-key-features)
