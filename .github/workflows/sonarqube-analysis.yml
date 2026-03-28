@@ -6,9 +6,9 @@ name: SonarQube Cloud Analysis
 
 on:
   push:
-    branches: [ 112244-Ficha3-Tarefa2-B.6 ]
+    branches: [ main ]
   pull_request:
-    branches: [ 112244-Ficha3-Tarefa2-B.6 ]
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
