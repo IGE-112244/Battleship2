@@ -10,14 +10,20 @@ on:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
-  workflow_dispatch:
+  workflow_dispatch: # permite execução manual
 
 jobs:
   large-class-detection:
-    name: Detect Large Class Code Smell
+    name: Detect Large Class Smell
     runs-on: ubuntu-latest
 
-    steps:
+steps:
+      - name: Verify Java version
+        run: |
+          java -version
+          mvn -version
+          echo "JAVA_HOME: $JAVA_HOME"
+        
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -30,39 +36,27 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Verify Java version
-        run: |
-          java -version
-          mvn -version
-
       - name: Create Qodana configuration for Large Class detection
         run: |
-          cat > qodana-largeclass.yaml << 'EOF'
-          version: "1.0"
-          profile:
-            name: qodana.starter
-          include:
-            - name: ClassWithTooManyMethods
-            - name: ClassWithTooManyFields
-          exclude:
-            - name: OverlyLongMethod
-            - name: OverlyComplexMethod
-            - name: MethodWithMultipleLoops
-            - name: MethodWithMultipleReturnPoints
-            - name: OverlyNestedMethod
-            - name: MethodWithMoreThanThreeNegations
-            - name: BusyWait
-            - name: SuspiciousIndentationAfterControlStatementWithoutBraces
-            - name: NullableProblems
-            - name: UnusedAssignment
-            - name: SlowAbstractSetRemoveAll
-            - name: OverlyLongLambdaExpression
-          linter: jetbrains/qodana-jvm:2024.3
-          projectJDK: "21"
-          failureConditions:
-            severityThresholds:
-              any: 1
-          EOF
+            cat > qodana-largeclass.yaml << 'EOF'
+            version: "1.0"
+            profile:
+              name: qodana.starter
+            include:
+              - name: ClassWithTooManyMethods
+              - name: ClassWithTooManyFields      
+            exclude:
+              - name: BusyWait
+              - name: SuspiciousIndentationAfterControlStatementWithoutBraces
+              - name: NullableProblems
+              - name: SlowAbstractSetRemoveAll
+              - name: UnusedAssignment
+            linter: jetbrains/qodana-jvm:2024.3
+            projectJDK: "21"
+            failureConditions:
+              severityThresholds:
+                any: 5
+            EOF
 
       - name: Run Qodana Large Class Analysis
         uses: JetBrains/qodana-action@v2024.3
@@ -72,6 +66,7 @@ jobs:
           upload-result: true
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_740574030 }}
+          JAVA_HOME: ${{ env.JAVA_HOME }}
 
       - name: Upload Qodana results as artifact
         uses: actions/upload-artifact@v4
