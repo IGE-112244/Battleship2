@@ -33,8 +33,25 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
+      - name: Create Qodana configuration for Large Class detection
+        run: |
+          cat > qodana-largeclass.yaml << 'EOF'
+          version: "1.0"
+          profile:
+            name: empty
+          include:
+            - name: ClassWithTooManyMethods
+            - name: ClassWithTooManyFields
+            - name: OverlyComplexClass
+          linter: jetbrains/qodana-jvm:2024.3
+          projectJDK: "21"
+          failureConditions:
+            severityThresholds:
+              any: 5
+          EOF
+
       - name: Run Qodana Large Class Analysis
-        uses: JetBrains/qodana-action@v2025.3
+        uses: JetBrains/qodana-action@v2024.3
         with:
           args: --config=qodana-largeclass.yaml
           results-dir: ${{ runner.temp }}/qodana-results
@@ -49,13 +66,3 @@ jobs:
           name: large-class-report
           path: ${{ runner.temp }}/qodana-results
           retention-days: 30
-
-      - name: Summary Report
-        if: always()
-        run: |
-          echo "## 🔍 Large Class Detection Report" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Inspeções Qodana ativas" >> $GITHUB_STEP_SUMMARY
-          echo "- ClassWithTooManyMethods" >> $GITHUB_STEP_SUMMARY
-          echo "- ClassWithTooManyFields" >> $GITHUB_STEP_SUMMARY
-          echo "- OverlyComplexClass" >> $GITHUB_STEP_SUMMARY
