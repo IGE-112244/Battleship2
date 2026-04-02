@@ -57,11 +57,11 @@ jobs:
             severityThresholds:
               any: 5
           EOF
-
+          
       - name: Run Qodana Large Class Analysis
         uses: JetBrains/qodana-action@v2024.3
         with:
-          args: --config,qodana-largeclass.yaml
+          args: --config=qodana-largeclass.yaml
           results-dir: ${{ runner.temp }}/qodana-results
           upload-result: true
         env:
