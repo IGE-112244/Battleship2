@@ -14,16 +14,16 @@ on:
 
 jobs:
   large-class-detection:
-    name: Detect Large Class Smell
+    name: Detect Large Class Code Smell
     runs-on: ubuntu-latest
 
-steps:
+    steps:
       - name: Verify Java version
         run: |
           java -version
           mvn -version
           echo "JAVA_HOME: $JAVA_HOME"
-        
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -38,25 +38,25 @@ steps:
 
       - name: Create Qodana configuration for Large Class detection
         run: |
-            cat > qodana-largeclass.yaml << 'EOF'
-            version: "1.0"
-            profile:
-              name: qodana.starter
-            include:
-              - name: ClassWithTooManyMethods
-              - name: ClassWithTooManyFields      
-            exclude:
-              - name: BusyWait
-              - name: SuspiciousIndentationAfterControlStatementWithoutBraces
-              - name: NullableProblems
-              - name: SlowAbstractSetRemoveAll
-              - name: UnusedAssignment
-            linter: jetbrains/qodana-jvm:2024.3
-            projectJDK: "21"
-            failureConditions:
-              severityThresholds:
-                any: 5
-            EOF
+          cat > qodana-largeclass.yaml << 'EOF'
+          version: "1.0"
+          profile:
+            name: qodana.starter
+          include:
+            - name: ClassWithTooManyMethods      # WMC elevado — Large Class
+            - name: OverlyComplexClass           # Complexidade funcional alta
+            - name: ClassWithTooManyFields       # Número excessivo de atributos
+          exclude:
+            - name: BusyWait
+            - name: SuspiciousIndentationAfterControlStatementWithoutBraces
+            - name: NullableProblems
+            - name: UnusedAssignment
+          linter: jetbrains/qodana-jvm:2024.3
+          projectJDK: "21"
+          failureConditions:
+            severityThresholds:
+              any: 5
+          EOF
 
       - name: Run Qodana Large Class Analysis
         uses: JetBrains/qodana-action@v2024.3
@@ -86,19 +86,22 @@ steps:
           echo "|---------|--------|-----------|" >> $GITHUB_STEP_SUMMARY
           echo "| WMC | ≥ 47 | Weighted Method Count (Very High) |" >> $GITHUB_STEP_SUMMARY
           echo "| TCC | < 1/3 | Tight Class Cohesion baixa |" >> $GITHUB_STEP_SUMMARY
-          echo "| ATFD | > 5 | Access To Foreign Data |" >> $GITHUB_STEP_SUMMARY
+          echo "| ATFD | > 5 | Access To Foreign Data (FEW) |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Inspeções Qodana ativas" >> $GITHUB_STEP_SUMMARY
-          echo "- **ClassWithTooManyMethods**: Classes com demasiados métodos" >> $GITHUB_STEP_SUMMARY
+          echo "- **ClassWithTooManyMethods**: Classes com WMC excessivo" >> $GITHUB_STEP_SUMMARY
+          echo "- **OverlyComplexClass**: Classes com complexidade muito alta" >> $GITHUB_STEP_SUMMARY
           echo "- **ClassWithTooManyFields**: Classes com demasiados atributos" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Nota sobre os resultados" >> $GITHUB_STEP_SUMMARY
-          echo "O projeto BattleShip2 é relativamente pequeno comparado" >> $GITHUB_STEP_SUMMARY
-          echo "com os sistemas industriais usados no livro de Lanza & Marinescu." >> $GITHUB_STEP_SUMMARY
-          echo "Os thresholds foram ajustados em relação aos valores iniciais" >> $GITHUB_STEP_SUMMARY
-          echo "do livro (WMC >= 47) para refletir a escala do projeto." >> $GITHUB_STEP_SUMMARY
+          echo "### Equivalência com Fowler" >> $GITHUB_STEP_SUMMARY
+          echo "O livro 'OO Metrics in Practice' (Lanza & Marinescu) formaliza o" >> $GITHUB_STEP_SUMMARY
+          echo "**Large Class** de Fowler como **God Class**, detetada quando:" >> $GITHUB_STEP_SUMMARY
+          echo "- ATFD > 5 (acede a dados de outras classes)" >> $GITHUB_STEP_SUMMARY
+          echo "- WMC >= 47 (complexidade funcional muito alta)" >> $GITHUB_STEP_SUMMARY
+          echo "- TCC < 1/3 (coesão baixa)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Refatorações sugeridas (Fowler)" >> $GITHUB_STEP_SUMMARY
           echo "- **Extract Class**: Dividir a classe em classes mais pequenas" >> $GITHUB_STEP_SUMMARY
           echo "- **Extract Subclass**: Mover comportamento para subclasses" >> $GITHUB_STEP_SUMMARY
+          echo "- **Extract Interface**: Separar a interface da implementação" >> $GITHUB_STEP_SUMMARY
           echo "- **Move Method**: Mover métodos para classes mais adequadas" >> $GITHUB_STEP_SUMMARY
