@@ -54,7 +54,7 @@ jobs:
       - name: Run Qodana Large Class Analysis
         uses: JetBrains/qodana-action@v2025.3
         with:
-          args: --config=qodana-large.yaml
+          args: --config=qodana-large.yaml --print-problems
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_740574030 }}
 
@@ -63,7 +63,7 @@ jobs:
         if: always()
         with:
           name: large-class-report
-          path: ${{ runner.temp }}/qodana/results
+          path: ${{ runner.temp }}/qodana-results
           retention-days: 30
 
       - name: Summary Report
