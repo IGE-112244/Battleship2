@@ -44,6 +44,7 @@ jobs:
             - name: ClassWithTooManyMethods
             - name: ClassWithTooManyFields
             - name: OverlyComplexClass
+            - name: GodClass
           linter: jetbrains/qodana-jvm:2025.3
           projectJDK: "21"
           failureConditions:
