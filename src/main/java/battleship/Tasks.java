@@ -1,7 +1,12 @@
 package battleship;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -32,6 +37,12 @@ public class Tasks {
 	private static final String MAPA = "mapa";
 	private static final String STATUS = "estado";
 	private static final String SIMULA = "simula";
+	private static final String RAJADAJSON = "rajadajson";
+	private static final String EXPORTJSON = "exportjson";
+	private static final String IAJOGO   = "iajogo";
+	private static final String IAJOGO2P = "iajogo2p";
+	private static final String STATS = "stats";
+	private static final String RESETSTATS = "resetstats";
 
 	/**
 	 * This task also tests the fighting element of a round of three shots
@@ -52,6 +63,8 @@ public class Tasks {
 					myFleet = Fleet.createRandom();
 					game = new Game(myFleet);
 					game.printMyBoard(false, true);
+					BoardVisualizer.iniciar();                                           // abre a janela
+					BoardVisualizer.atualizar(myFleet, game.getAlienMoves(), false);    // mostra tabuleiro inicial
 					break;
 				case LEFROTA:
 					myFleet = buildFleet(in);
@@ -63,36 +76,66 @@ public class Tasks {
 						myFleet.printStatus();
 					break;
 				case MAPA:
-					if (myFleet != null)
+					if (myFleet != null) {
 						game.printMyBoard(false, true);
+						BoardVisualizer.atualizar(myFleet, game.getAlienMoves(), false); // atualiza
+					}
 					break;
 				case RAJADA:
 					if (game != null) {
 						game.readEnemyFire(in);
 						myFleet.printStatus();
 						game.printMyBoard(true, false);
+						BoardVisualizer.atualizar(myFleet, game.getAlienMoves(), true);  // atualiza com tiros
 
 						if (game.getRemainingShips() == 0) {
 							game.over();
+                            BoardVisualizer.fechar();                                  // fecha a janela
+							String pdfFile = "historico_partida_" + System.currentTimeMillis() + ".pdf";
+							GamePdfExporter.export(game, pdfFile);
+							System.out.println("Histórico exportado para: " + pdfFile);
+							String jsonFile = "historico_partida_" + System.currentTimeMillis() + ".json";
+							GameJsonExporter.export(game, jsonFile);
+							System.out.println("Histórico exportado para: " + jsonFile);
+
+							GameStats stats = GameStatsRepository.load();
+							stats.update(game, true); // true = jogador ganhou
+							GameStatsRepository.save(stats);
+							GameStatsPanel.mostrar();
+
 							System.exit(0);
 						}
 					}
 					break;
 				case SIMULA:
 					if (game != null) {
-						while (game.getRemainingShips() > 0){
+						while (game.getRemainingShips() > 0) {
 							game.randomEnemyFire();
 							myFleet.printStatus();
 							game.printMyBoard(true, false);
+							BoardVisualizer.atualizar(myFleet, game.getAlienMoves(), true); // atualiza a cada jogada
 							try {
 								Thread.sleep(3000);
 							} catch (InterruptedException e) {
-								Thread.currentThread().interrupt(); // Best practice: restore interrupt status
+								Thread.currentThread().interrupt();
 							}
 						}
 
 						if (game.getRemainingShips() == 0) {
 							game.over();
+							String pdfFile = "historico_partida_" + System.currentTimeMillis() + ".pdf";
+							GamePdfExporter.export(game, pdfFile);
+							System.out.println("Histórico exportado para: " + pdfFile);
+							String jsonFile = "historico_partida_" + System.currentTimeMillis() + ".json";
+							GameJsonExporter.export(game, jsonFile);
+							System.out.println("Histórico exportado para: " + jsonFile);
+							BoardVisualizer.fechar();                                    // fecha a janela
+
+							GameStats stats = GameStatsRepository.load();
+							stats.update(game, true); // true = jogador ganhou
+							GameStatsRepository.save(stats);
+							GameStatsPanel.mostrar();
+
 							System.exit(0);
 						}
 					}
@@ -104,13 +147,229 @@ public class Tasks {
                 case AJUDA:
                     menuHelp();
                     break;
+				case EXPORTJSON:
+					if (game != null) {
+						String jsonFile = "historico_partida_" + System.currentTimeMillis() + ".json";
+						GameJsonExporter.export(game, jsonFile);
+						System.out.println("Histórico exportado para: " + jsonFile);
+					} else {
+						System.out.println("Ainda não existe jogo iniciado!");
+					}
+					break;
+				case RAJADAJSON:
+					if (game != null) {
+						((Game) game).readEnemyFireFromJson(in);
+						myFleet.printStatus();
+						game.printMyBoard(true, false);
+						BoardVisualizer.atualizar(myFleet, game.getAlienMoves(), true);
+						if (game.getRemainingShips() == 0) {
+							game.over();
+							BoardVisualizer.fechar();
+							String pdfFile = "historico_partida_" + System.currentTimeMillis() + ".pdf";
+							GamePdfExporter.export(game, pdfFile);
+							String jsonFile = "historico_partida_" + System.currentTimeMillis() + ".json";
+							GameJsonExporter.export(game, jsonFile);
+							GameStats stats = GameStatsRepository.load();
+							stats.update(game, true);
+							GameStatsRepository.save(stats);
+							GameStatsPanel.mostrar();
+							System.exit(0);
+						}
+					}
+					break;
+				case IAJOGO2P:
+					if (game != null) {
+						System.out.println("A iniciar jogo bidirecional contra o LLM...");
+						System.out.println("Tu atacas a frota da IA, a IA ataca a tua frota!");
+						System.out.println("Usa o comando 'rajada' seguido de 3 coordenadas para atacar.");
+
+						// Carregar system prompt
+						try {
+							HuggingFaceClient.setSystemPrompt(
+									new String(java.nio.file.Files.readAllBytes(
+											java.nio.file.Paths.get("battleship_system_prompt.txt")))
+							);
+						} catch (IOException e) {
+							System.out.println("Erro ao carregar o system prompt: " + e.getMessage());
+							break;
+						}
+
+						// Inicializar a IA
+						System.out.println("A IA está a criar a sua frota...");
+						HuggingFaceClient.initGame();
+
+						// ✅ Frota da IA gerida em Java (honesta e consistente)
+						IFleet aiFleet = Fleet.createRandom();
+						System.out.println("✅ Frota da IA gerada. Jogo pronto!");
+
+						// Contadores
+						int[] aiShipsRemaining = {aiFleet.getFloatingShips().size()};
+						List<IMove> aiReceivedMoves = new ArrayList<>();
+						int[] aiMoveNumber = {1};
+						String lastAiResult = null;
+
+						while (game.getRemainingShips() > 0 && aiShipsRemaining[0] > 0) {
+
+							// -------------------------------------------------------
+							// FASE 1: IA ataca o teu tabuleiro
+							// -------------------------------------------------------
+							System.out.println("\n⚔️  A IA está a atacar...");
+							List<IPosition> aiShots = HuggingFaceClient.getNextShots(lastAiResult);
+							game.fireShots(aiShots);
+							myFleet.printStatus();
+							game.printMyBoard(true, false);
+							BoardVisualizer.atualizar(myFleet, game.getAlienMoves(), game.getMyMoves(), true);
+							lastAiResult = game.getAlienMoves()
+									.get(game.getAlienMoves().size() - 1)
+									.processEnemyFire(true);
+
+// Guardar resultados dos tiros da IA no diário
+							List<IPosition> lastAiShots = game.getAlienMoves()
+									.get(game.getAlienMoves().size() - 1).getShots();
+							List<IGame.ShotResult> lastAiShotResults = game.getAlienMoves()
+									.get(game.getAlienMoves().size() - 1).getShotResults();
+
+							for (int i = 0; i < lastAiShots.size(); i++) {
+								IPosition pos = lastAiShots.get(i);
+								String posKey = String.valueOf(pos.getClassicRow()) + pos.getClassicColumn();
+								if (i < lastAiShotResults.size()) {
+									IGame.ShotResult r = lastAiShotResults.get(i);
+									String resultado;
+									if (!r.valid())       resultado = "fora do tabuleiro";
+									else if (r.repeated()) resultado = "repetido";
+									else if (r.ship() != null) {
+										resultado = r.sunk()
+												? "🔥 " + r.ship().getCategory() + " AFUNDADO"
+												: "💥 acerto em " + r.ship().getCategory();
+									} else                resultado = "água";
+									HuggingFaceClient.addShotResult(posKey, resultado);
+								}
+							}
+
+							if (game.getRemainingShips() == 0) break;
+
+							// -------------------------------------------------------
+							// FASE 2: Tu atacas a frota da IA
+							// -------------------------------------------------------
+							System.out.println("\n🎯 A tua vez! Escreve 'rajada' seguido de 3 coordenadas:");
+							System.out.print("> ");
+							String playerCommand = in.next();
+
+							if (playerCommand.equals(RAJADA)) {
+								List<IPosition> myShots = readPlayerShots(in);
+
+								// Processar tiros em Java (honesto e consistente)
+								List<IGame.ShotResult> myResults = new ArrayList<>();
+								List<IPosition> alreadyShot = new ArrayList<>();
+
+								for (IPosition pos : myShots) {
+									// Verificar se já foi disparado anteriormente
+									boolean repeated = alreadyShot.contains(pos)
+											|| aiReceivedMoves.stream()
+											.flatMap(m -> m.getShots().stream())
+											.anyMatch(p -> p.equals(pos));
+
+									if (!pos.isInside()) {
+										myResults.add(new IGame.ShotResult(false, false, null, false));
+									} else if (repeated) {
+										myResults.add(new IGame.ShotResult(true, true, null, false));
+									} else {
+										IShip ship = aiFleet.shipAt(pos);
+										if (ship != null) {
+											ship.shoot(pos);
+											myResults.add(new IGame.ShotResult(
+													true, false, ship, !ship.stillFloating()));
+										} else {
+											myResults.add(new IGame.ShotResult(true, false, null, false));
+										}
+									}
+									alreadyShot.add(pos);
+								}
+
+								// Registar o move
+								Move myMove = new Move(aiMoveNumber[0]++, myShots, myResults);
+								aiReceivedMoves.add(myMove);
+								game.getMyMoves().add(myMove);
+
+								// Mostrar resultado ao jogador
+								StringBuilder resultMsg = new StringBuilder("\n📊 Resultado dos teus tiros:\n");
+								for (IGame.ShotResult r : myResults) {
+									if (!r.valid()) {
+										resultMsg.append("❌ Tiro fora do tabuleiro!\n");
+										continue;
+									}
+									if (r.repeated()) {
+										resultMsg.append("🔄 Tiro repetido!\n");
+										continue;
+									}
+									if (r.ship() != null) {
+										if (r.sunk()) {
+											aiShipsRemaining[0]--;
+											resultMsg.append("🔥 Afundaste: ")
+													.append(r.ship().getCategory()).append("!\n");
+										} else {
+											resultMsg.append("💥 Acertaste numa ")
+													.append(r.ship().getCategory()).append("!\n");
+										}
+									} else {
+										resultMsg.append("💧 Tiro na água.\n");
+									}
+								}
+								resultMsg.append("Navios da IA restantes: ")
+										.append(Math.max(0, aiShipsRemaining[0]));
+								System.out.println(resultMsg);
+
+								// Atualizar tabuleiro
+								BoardVisualizer.atualizar(myFleet, game.getAlienMoves(),
+										game.getMyMoves(), true);
+							}
+						}
+
+						// -------------------------------------------------------
+						// Fim do jogo
+						// -------------------------------------------------------
+						if (game.getRemainingShips() == 0 && aiShipsRemaining[0] > 0) {
+							System.out.println("\n💀 A tua frota foi destruída! A IA ganhou!");
+						} else if (aiShipsRemaining[0] <= 0) {
+							System.out.println("\n🏆 Afundaste toda a frota da IA! Ganhaste!");
+						}
+
+						game.over();
+						BoardVisualizer.fechar();
+						exportAndSaveStats(game);
+						System.exit(0);
+					}
+				case STATS:
+					GameStatsPanel.mostrar();
+					break;
+
+				case RESETSTATS:
+					GameStatsRepository.reset();
+					break;
 				default:
 					System.out.println("Que comando é esse??? Repete ...");
 			}
 			System.out.print("> ");
 			command = in.next();
 		}
+		BoardVisualizer.fechar();
 		System.out.println(GOODBYE_MESSAGE);
+	}
+
+	private static void exportAndSaveStats(IGame game) {
+
+			String pdfFile  = "historico_partida_" + System.currentTimeMillis() + ".pdf";
+			String jsonFile = "historico_partida_" + System.currentTimeMillis() + ".json";
+			GamePdfExporter.export(game, pdfFile);
+			System.out.println("Histórico PDF exportado para: " + pdfFile);
+			GameJsonExporter.export(game, jsonFile);
+			System.out.println("Histórico JSON exportado para: " + jsonFile);
+			GameStats stats = GameStatsRepository.load();
+			stats.update(game, game.getRemainingShips() == 0);
+			GameStatsRepository.save(stats);
+			System.out.println("Estatísticas guardadas.");
+			GameStatsPanel.mostrar();
+
 	}
 
 	/**
@@ -124,9 +383,14 @@ public class Tasks {
 		System.out.println("- " + STATUS + ": Mostra o status atual da frota.)");
 		System.out.println("- " + MAPA + ": Exibe o mapa da frota.");
 		System.out.println("- " + RAJADA + ": Realiza uma rajada de disparos.");
+		System.out.println("- " + RAJADAJSON + ": Insere uma rajada em formato JSON (para jogar contra LLM).");
 		System.out.println("- " + SIMULA + ": Simula um jogo completo.");
+		System.out.println("- " + IAJOGO2P + ": Jogo bidirecional — tu e a IA atacam-se mutuamente.");
 		System.out.println("- " + TIROS + ": Lista os tiros válidos realizados (* = tiro em navio, o = tiro na água)");
 		System.out.println("- " + DESISTIR + ": Encerra o jogo.");
+		System.out.println("- " + STATS + ": Mostra o painel de estatísticas.");
+		System.out.println("- " + RESETSTATS + ": Apaga todas as estatísticas.");
+		System.out.println("- " + EXPORTJSON + ": Exporta o histórico da partida para JSON.");
 		System.out.println("===============================================================");
 	}
 	/**
@@ -226,5 +490,23 @@ public class Tasks {
 			throw new IllegalArgumentException("Formato inválido. Use 'A3', 'A 3' ou similar.");
 		}
 	}
+
+	/**
+	 * Lê as posições dos tiros do jogador a partir do scanner.
+	 */
+	private static List<IPosition> readPlayerShots(Scanner in) {
+		List<IPosition> shots = new ArrayList<>();
+		String line = in.nextLine().trim();
+		Scanner lineScanner = new Scanner(line);
+		while (shots.size() < Game.NUMBER_SHOTS && lineScanner.hasNext()) {
+			shots.add(readClassicPosition(lineScanner));
+		}
+		if (shots.size() != Game.NUMBER_SHOTS) {
+			throw new IllegalArgumentException("Insere exatamente " + Game.NUMBER_SHOTS + " posições!");
+		}
+		return shots;
+	}
+
+
 
 }
