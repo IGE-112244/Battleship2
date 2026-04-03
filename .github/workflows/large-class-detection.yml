@@ -44,7 +44,7 @@ jobs:
             - name: ClassWithTooManyMethods
             - name: ClassWithTooManyFields
             - name: OverlyComplexClass
-          linter: jetbrains/qodana-jvm:2024.3
+          linter: jetbrains/qodana-jvm:2025.3
           projectJDK: "21"
           failureConditions:
             severityThresholds:
@@ -52,9 +52,9 @@ jobs:
           EOF
           
       - name: Run Qodana Large Class Analysis
-        uses: JetBrains/qodana-action@v2024.3
+        uses: JetBrains/qodana-action@v2025.3
         with:
-          args: --config qodana-large.yaml
+          args: --config=qodana-large.yaml
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_740574030 }}
 
