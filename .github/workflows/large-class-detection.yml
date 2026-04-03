@@ -34,13 +34,40 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
+      - name: Override qodana.yaml for Large Class detection
+        run: |
+          cat > qodana.yaml << 'EOF'
+          version: "1.0"
+          linter: jetbrains/qodana-jvm:2025.3
+          profile:
+            name: qodana.recommended
+          include:
+            - name: ClassWithTooManyMethods
+            - name: ClassWithTooManyFields
+            - name: OverlyComplexClass
+          exclude:
+            - name: OverlyLongMethod
+            - name: OverlyComplexMethod
+            - name: MethodWithMultipleLoops
+            - name: MethodWithMultipleReturnPoints
+            - name: OverlyNestedMethod
+            - name: MethodWithMoreThanThreeNegations
+            - name: BusyWait
+            - name: SuspiciousIndentationAfterControlStatementWithoutBraces
+            - name: NullableProblems
+            - name: UnusedAssignment
+            - name: SlowAbstractSetRemoveAll
+            - name: OverlyLongLambdaExpression
+          projectJDK: "21"
+          failureConditions:
+            severityThresholds:
+              any: 1
+          EOF
+
       - name: Run Qodana Large Class Analysis
         uses: JetBrains/qodana-action@v2025.3
         with:
           pr-mode: false
-          args: >-
-            --profile-name,qodana.recommended,
-            --include-inspections,ClassWithTooManyMethods:ClassWithTooManyFields:OverlyComplexClass
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_740574030 }}
 
