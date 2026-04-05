@@ -15,7 +15,7 @@ import java.util.List;
      * Utiliza a biblioteca OpenPDF (com.github.librepdf:openpdf).
      */
     public class GamePdfExporter {
-
+        //test sonar
         // Cores do tema naval
         private static final Color COLOR_NAVY     = new Color(10, 36, 99);
         private static final Color COLOR_OCEAN    = new Color(30, 100, 180);
@@ -64,7 +64,7 @@ import java.util.List;
         }
 
         // -----------------------------------------------------------------------
-        // Secção: Título
+        // Secção:Título
         // -----------------------------------------------------------------------
 
         private static void addTitle(Document doc, IGame game) throws DocumentException {
