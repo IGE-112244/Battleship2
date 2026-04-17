@@ -217,6 +217,32 @@ Após fazer push desta alteração para o branch main, o workflow SonarQube Clou
 
 Após a verificação, o erro intencional foi revertido através de um novo commit, e o workflow voltou a executar, confirmando o restabelecimento do estado anterior do projeto. Esta experiência demonstra na prática o valor da integração de ferramentas de análise estática de qualidade em pipelines de CI/CD, permitindo detetar e corrigir problemas de qualidade de forma contínua e automatizada.
 
+## Respostas à Ficha 4
+
+Parte 1 - B)
+3.
+### Java CI with Maven
+
+Este repositório utiliza GitHub Actions para automatizar a execução dos testes unitários em cada push para o branch `main`.
+
+**Workflow:** `.github/workflows/maven-ci.yml`
+
+**Quando corre:**
+- A cada push para o branch `main`
+- A cada pull request com destino ao branch `main`
+
+**O que faz:**
+1. Faz checkout do repositório
+2. Configura o JDK 21 (Temurin)
+3. Compila o projeto e corre todos os testes unitários com `mvn test`
+4. Guarda os relatórios de teste como artefacto
+
+**Como verificar os resultados:**
+- Vai ao separador **Actions** no GitHub
+- Clica na execução mais recente do workflow **Java CI with Maven**
+- Verifica o output do step **Build and run unit tests with Maven**
+- Os relatórios detalhados estão disponíveis em **Artifacts → test-results**
+
 ## 📖 Table of Contents
 - [Project Overview](#-project-overview)
 - [Key Features](#-key-features)
