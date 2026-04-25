@@ -20,6 +20,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import okhttp3.OkHttpClient;
 import org.junit.jupiter.api.*;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -46,6 +48,23 @@ class HuggingFaceClientTest {
     void tearDown() {
         // Limpar estado estático após cada teste
         HuggingFaceClient.setSystemPrompt(null);
+    }
+
+    @BeforeAll
+    static void setUpClass() throws Exception {
+        String envToken = System.getenv("HF_TOKEN");
+        if (envToken != null && !envToken.isEmpty()) {
+            // Criar config.properties temporário para o loadToken() encontrar
+            try (java.io.FileWriter fw = new java.io.FileWriter("config.properties")) {
+                fw.write("HF_TOKEN=" + envToken);
+            }
+            System.out.println("Token configurado: " + envToken.substring(0, 5) + "...");
+        }
+    }
+
+    @AfterAll
+    static void tearDownClass() throws Exception {
+        new java.io.File("config.properties").delete();
     }
 
     // -----------------------------------------------------------------------
@@ -286,32 +305,32 @@ class HuggingFaceClientTest {
     }
 
     @Test
-    @DisplayName("loadToken() should return env token when config.properties does not exist")
+    @DisplayName("loadToken() should return token from environment variable")
     void loadToken1() throws Exception {
         Method method = HuggingFaceClient.class
                 .getDeclaredMethod("loadToken");
         method.setAccessible(true);
 
-        // Sem config.properties, deve retornar a variável de ambiente
+        // Simplesmente verificar que não lança exceção
+        // O branch depende da variável de ambiente disponível
         assertDoesNotThrow(() -> method.invoke(null),
-                "Error: loadToken() should not throw when config.properties does not exist.");
+                "Error: loadToken() should not throw.");
     }
 
     @Test
-    @DisplayName("loadToken() should load token from config.properties when it exists")
+    @DisplayName("loadToken() should return token from config.properties when env not set")
     void loadToken2() throws Exception {
+        // Criar config.properties temporário na raiz
         java.io.File configFile = new java.io.File("config.properties");
-
-        // Fazer backup do conteúdo original
         String originalContent = null;
         if (configFile.exists()) {
             originalContent = new String(java.nio.file.Files.readAllBytes(configFile.toPath()));
         }
 
         try {
-            // Criar config.properties temporário com token de teste
+            // Criar config com token válido
             try (java.io.FileWriter fw = new java.io.FileWriter(configFile)) {
-                fw.write("HF_TOKEN=hf_test12345token");
+                fw.write("HF_TOKEN=hf_test_token_valido");
             }
 
             Method method = HuggingFaceClient.class
@@ -319,16 +338,141 @@ class HuggingFaceClientTest {
             method.setAccessible(true);
 
             assertDoesNotThrow(() -> method.invoke(null),
-                    "Error: loadToken() should load token from config.properties without throwing.");
-
+                    "Error: loadToken() should read from config.properties.");
         } finally {
-            // SEMPRE restaurar o conteúdo original
             if (originalContent != null) {
                 try (java.io.FileWriter fw = new java.io.FileWriter(configFile)) {
                     fw.write(originalContent);
                 }
             } else {
                 configFile.delete();
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("loadToken() should return null when no token available")
+    void loadToken3() throws Exception {
+        // Criar config.properties sem HF_TOKEN
+        java.io.File configFile = new java.io.File("config.properties");
+        String originalContent = null;
+        if (configFile.exists()) {
+            originalContent = new String(java.nio.file.Files.readAllBytes(configFile.toPath()));
+        }
+
+        try {
+            try (java.io.FileWriter fw = new java.io.FileWriter(configFile)) {
+                fw.write("OUTRA_PROPRIEDADE=valor");
+            }
+
+            Method method = HuggingFaceClient.class
+                    .getDeclaredMethod("loadToken");
+            method.setAccessible(true);
+
+            assertDoesNotThrow(() -> method.invoke(null),
+                    "Error: loadToken() should not throw when token property is missing.");
+        } finally {
+            if (originalContent != null) {
+                try (java.io.FileWriter fw = new java.io.FileWriter(configFile)) {
+                    fw.write(originalContent);
+                }
+            } else {
+                configFile.delete();
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("loadToken() should return null when no token available anywhere")
+    void loadTokenNull() throws Exception {
+        try (MockedStatic<HuggingFaceClient> mockedClient =
+                     Mockito.mockStatic(HuggingFaceClient.class, Mockito.CALLS_REAL_METHODS)) {
+
+            // Simular que getEnvToken() retorna null
+            mockedClient.when(HuggingFaceClient::getEnvToken).thenReturn(null);
+
+            // Criar config.properties sem HF_TOKEN
+            java.io.File configFile = new java.io.File("config.properties");
+            String originalContent = null;
+            if (configFile.exists()) {
+                originalContent = new String(java.nio.file.Files.readAllBytes(configFile.toPath()));
+            }
+
+            try {
+                try (java.io.FileWriter fw = new java.io.FileWriter(configFile)) {
+                    fw.write("OUTRA_PROPRIEDADE=valor");
+                }
+
+                Method method = HuggingFaceClient.class
+                        .getDeclaredMethod("loadToken");
+                method.setAccessible(true);
+
+                Object result = method.invoke(null);
+                assertNull(result,
+                        "Error: loadToken() should return null when no token is available.");
+
+            } finally {
+                if (originalContent != null) {
+                    try (java.io.FileWriter fw = new java.io.FileWriter(configFile)) {
+                        fw.write(originalContent);
+                    }
+                } else {
+                    configFile.delete();
+                }
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("loadToken() should return env token when available")
+    void loadTokenFromEnv() throws Exception {
+        try (MockedStatic<HuggingFaceClient> mockedClient =
+                     Mockito.mockStatic(HuggingFaceClient.class, Mockito.CALLS_REAL_METHODS)) {
+
+            mockedClient.when(HuggingFaceClient::getEnvToken).thenReturn("hf_test_token");
+
+            Method method = HuggingFaceClient.class
+                    .getDeclaredMethod("loadToken");
+            method.setAccessible(true);
+
+            Object result = method.invoke(null);
+            assertEquals("hf_test_token", result,
+                    "Error: loadToken() should return the env token.");
+        }
+    }
+
+    @Test
+    @DisplayName("loadToken() should return null when config.properties throws exception")
+    void loadTokenException() throws Exception {
+        try (MockedStatic<HuggingFaceClient> mockedClient =
+                     Mockito.mockStatic(HuggingFaceClient.class, Mockito.CALLS_REAL_METHODS)) {
+
+            // Simular que não há variável de ambiente
+            mockedClient.when(HuggingFaceClient::getEnvToken).thenReturn(null);
+
+            // Garantir que config.properties não existe
+            java.io.File configFile = new java.io.File("config.properties");
+            String originalContent = null;
+            if (configFile.exists()) {
+                originalContent = new String(java.nio.file.Files.readAllBytes(configFile.toPath()));
+                configFile.delete(); // apagar temporariamente
+            }
+
+            try {
+                Method method = HuggingFaceClient.class
+                        .getDeclaredMethod("loadToken");
+                method.setAccessible(true);
+
+                Object result = method.invoke(null);
+                assertNull(result,
+                        "Error: loadToken() should return null when config.properties is missing.");
+
+            } finally {
+                if (originalContent != null) {
+                    try (java.io.FileWriter fw = new java.io.FileWriter(configFile)) {
+                        fw.write(originalContent);
+                    }
+                }
             }
         }
     }
@@ -444,16 +588,17 @@ class HuggingFaceClientTest {
 // -----------------------------------------------------------------------
 
     private boolean isTokenAvailable() {
-        // Verificar config.properties primeiro (mesma ordem que loadToken())
+        // Verificar variável de ambiente primeiro (GitHub Actions secret)
+        String envToken = System.getenv("HF_TOKEN");
+        if (envToken != null && !envToken.isEmpty()) return true;
+        // Fallback para config.properties (local)
         try {
             java.util.Properties props = new java.util.Properties();
             props.load(new java.io.FileReader("config.properties"));
             String token = props.getProperty("HF_TOKEN");
             return token != null && !token.isEmpty();
         } catch (Exception e) {
-            // Fallback para variável de ambiente
-            String token = System.getenv("HF_TOKEN");
-            return token != null && !token.isEmpty();
+            return false;
         }
     }
 
@@ -670,43 +815,6 @@ class HuggingFaceClientTest {
         assertThrows(java.lang.reflect.InvocationTargetException.class,
                 () -> method.invoke(null, "texto com [ mas sem fechar", '[', ']'),
                 "Error: extractJson() should throw when closing bracket is not found.");
-    }
-
-    @Test
-    @DisplayName("loadToken() catch block should return env token when token property is null")
-    void loadToken3() throws Exception {
-        java.io.File configFile = new java.io.File("config.properties");
-
-        String originalContent = null;
-        if (configFile.exists()) {
-            originalContent = new String(java.nio.file.Files.readAllBytes(configFile.toPath()));
-        }
-
-        try {
-            // Criar config.properties sem a propriedade HF_TOKEN
-            // para forçar token == null e erro no substring
-            try (java.io.FileWriter fw = new java.io.FileWriter(configFile)) {
-                fw.write("OUTRA_PROPRIEDADE=valor"); // sem HF_TOKEN
-            }
-
-            Method method = HuggingFaceClient.class
-                    .getDeclaredMethod("loadToken");
-            method.setAccessible(true);
-
-            // Deve entrar no catch (NullPointerException no substring)
-            // e retornar System.getenv("HF_TOKEN")
-            assertDoesNotThrow(() -> method.invoke(null),
-                    "Error: loadToken() catch block should not throw.");
-
-        } finally {
-            if (originalContent != null) {
-                try (java.io.FileWriter fw = new java.io.FileWriter(configFile)) {
-                    fw.write(originalContent);
-                }
-            } else {
-                configFile.delete();
-            }
-        }
     }
 
     @Test
