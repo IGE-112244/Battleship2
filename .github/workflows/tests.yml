@@ -25,6 +25,16 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
+      - name: Debug config.properties
+        run: |
+          echo "Working directory: $(pwd)"
+          echo "Config exists: $(test -f config.properties && echo YES || echo NO)"
+          echo "Config content:"
+          cat config.properties || echo "File not found"
+          echo "HF_TOKEN env: ${HF_TOKEN:0:5}..."
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+
       - name: Build and run unit tests with Maven
         run: mvn -B test --file pom.xml
         env:
