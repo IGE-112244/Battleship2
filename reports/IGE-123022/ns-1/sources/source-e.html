@@ -1,0 +1,177 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GameStatsRepository</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">battleship</a>
+</div>
+
+<h1>Coverage Summary for Class: GameStatsRepository (battleship)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GameStatsRepository</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (4/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    91,7%
+  </span>
+  <span class="absValue">
+    (11/12)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package battleship;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.databind.ObjectMapper;
+&nbsp;import com.fasterxml.jackson.databind.SerializationFeature;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;
+&nbsp;/**
+&nbsp; * Gere a persistência das estatísticas do jogador em JSON.
+&nbsp; * Utiliza a biblioteca Jackson (já existente no projeto).
+&nbsp; * O ficheiro é guardado em &quot;stats.json&quot; na raiz do projeto.
+&nbsp; */
+<b class="nc">&nbsp;public class GameStatsRepository {</b>
+&nbsp;
+&nbsp;    private static final String STATS_FILE = &quot;stats.json&quot;;
+&nbsp;    private static final ObjectMapper mapper;
+&nbsp;
+&nbsp;    static {
+<b class="fc">&nbsp;        mapper = new ObjectMapper();</b>
+<b class="fc">&nbsp;        mapper.enable(SerializationFeature.INDENT_OUTPUT);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Carrega as estatísticas do ficheiro JSON.
+&nbsp;     * Se o ficheiro não existir, devolve estatísticas a zero.
+&nbsp;     *
+&nbsp;     * @return as estatísticas carregadas ou novas se não existir ficheiro
+&nbsp;     */
+&nbsp;    public static GameStats load() {
+<b class="fc">&nbsp;        File file = new File(STATS_FILE);</b>
+<b class="fc">&nbsp;        if (!file.exists()) return new GameStats();</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            return mapper.readValue(file, GameStats.class);</b>
+&nbsp;        } catch (IOException e) {
+<b class="fc">&nbsp;            System.out.println(&quot;Erro ao carregar estatísticas, a iniciar a zero.&quot;);</b>
+<b class="fc">&nbsp;            return new GameStats();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Guarda as estatísticas no ficheiro JSON.
+&nbsp;     *
+&nbsp;     * @param stats as estatísticas a guardar
+&nbsp;     */
+&nbsp;    public static void save(GameStats stats) {
+&nbsp;        try {
+<b class="fc">&nbsp;            mapper.writeValue(new File(STATS_FILE), stats);</b>
+&nbsp;        } catch (IOException e) {
+<b class="fc">&nbsp;            System.out.println(&quot;Erro ao guardar estatísticas: &quot; + e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Apaga todas as estatísticas acumuladas.
+&nbsp;     */
+&nbsp;    public static void reset() {
+<b class="fc">&nbsp;        save(new GameStats());</b>
+<b class="fc">&nbsp;        System.out.println(&quot;Estatísticas apagadas com sucesso!&quot;);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-04-26 18:19</div>
+</div>
+</body>
+</html>

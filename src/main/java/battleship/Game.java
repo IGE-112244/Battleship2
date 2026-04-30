@@ -450,8 +450,7 @@ public class Game implements IGame
 	 * @return o JSON de resposta para enviar ao LLM
 	 */
 	public String readEnemyFireFromJson(Scanner in) {
-
-		System.out.println("Cola aqui o JSON do Gemini (termina com linha vazia):");
+System.out.println("Cola aqui o JSON do Gemini (termina com linha vazia):");
 		StringBuilder sb = new StringBuilder();
 		String line;
 		while (!(line = in.nextLine()).isEmpty()) {

@@ -1,0 +1,16 @@
+version: "1.0"
+
+profile:
+  name: empty
+
+include:
+  - name: ClassWithTooManyMethods
+  - name: ClassWithTooManyFields
+  - name: OverlyComplexClass
+
+linter: jetbrains/qodana-jvm:2024.3
+projectJDK: "21"
+
+failureConditions:
+  severityThresholds:
+    any: 1
