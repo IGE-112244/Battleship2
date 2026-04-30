@@ -5,14 +5,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Test class for Compass.
- * Author: britoeabreu
- * Date: 2023-10-10
- * Time: 15:30
+ * Author: IGE-122989
+ * Date: 2026-04-29 15:30
+ *
  * Cyclomatic Complexity for each method:
  * - Constructor: 1
- * - getDirection: 1
- * - toString: 1
- * - charToCompass: 4
+ * - getDirection(): 1
+ * - toString(): 1
+ * - randomBearing(): 1
+ * - charToCompass(): 5
  */
 public class CompassTest {
 
@@ -88,4 +89,37 @@ public class CompassTest {
 	void charToCompass3() {
 		assertNull(Compass.charToCompass('\0'), "Error: Null character should map to null.");
 	}
+
+	@Test
+	@DisplayName("randomBearing(): deve devolver um valor válido do enum")
+	void randomBearing() {
+		Compass c = Compass.randomBearing();
+		assertNotNull(c, "Error: randomBearing() should never return null.");
+	}
+
+	@Test
+	@DisplayName("charToCompass4(): caracteres maiúsculos devem devolver null")
+	void charToCompass4() {
+		assertNull(Compass.charToCompass('N'),
+				"Error: uppercase 'N' should return null.");
+	}
+
+	@Test
+	@DisplayName("toString2(): deve devolver o mesmo char de getDirection()")
+	void toString2() {
+		assertAll(
+				() -> assertEquals("n", Compass.NORTH.toString(), "Error: NORTH should be 'n'."),
+				() -> assertEquals("s", Compass.SOUTH.toString(), "Error: SOUTH should be 's'."),
+				() -> assertEquals("e", Compass.EAST.toString(), "Error: EAST should be 'e'."),
+				() -> assertEquals("o", Compass.WEST.toString(), "Error: WEST should be 'o'.")
+		);
+	}
+
+	@Test
+	void charToCompass5() {
+		assertEquals(Compass.NORTH, Compass.charToCompass('n'), "Error: 'n' should map to NORTH.");
+	}
+
+
+
 }
