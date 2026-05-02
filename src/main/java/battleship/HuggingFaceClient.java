@@ -45,6 +45,9 @@ public class HuggingFaceClient {
     // Configuração
     // -----------------------------------------------------------------------
 
+    private HuggingFaceClient() {
+        throw new UnsupportedOperationException("Utility class");
+    }
     /**
      * Define o prompt de sistema com as regras e estratégia do jogo.
      * Deve ser chamado antes de iniciar o jogo.

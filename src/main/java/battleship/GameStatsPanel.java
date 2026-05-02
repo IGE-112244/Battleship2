@@ -15,6 +15,9 @@ public class GameStatsPanel {
 
     private static JFrame frame;
 
+    private GameStatsPanel() {
+        throw new UnsupportedOperationException("Utility class");
+    }
     /**
      * Abre (ou atualiza) o painel de estatísticas com os dados atuais.
      * Se o painel já estiver aberto, fecha e reabre com dados atualizados.

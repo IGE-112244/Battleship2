@@ -21,6 +21,10 @@ public class GameStatsRepository {
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
     }
 
+    private GameStatsRepository() {
+        throw new UnsupportedOperationException("Utility class");
+    }
+
     /**
      * Carrega as estatísticas do ficheiro JSON.
      * Se o ficheiro não existir, devolve estatísticas a zero.
