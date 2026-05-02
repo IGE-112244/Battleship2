@@ -2,6 +2,8 @@ package battleship;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,6 +17,7 @@ public class GameStatsRepository {
 
     private static final String STATS_FILE = "stats.json";
     private static final ObjectMapper mapper;
+    private static final Logger log = LogManager.getLogger(GameStatsRepository.class);
 
     static {
         mapper = new ObjectMapper();
@@ -37,7 +40,7 @@ public class GameStatsRepository {
         try {
             return mapper.readValue(file, GameStats.class);
         } catch (IOException e) {
-            System.out.println("Erro ao carregar estatísticas, a iniciar a zero.");
+            log.info("Erro ao carregar estatísticas, a iniciar a zero.");
             return new GameStats();
         }
     }
@@ -51,7 +54,7 @@ public class GameStatsRepository {
         try {
             mapper.writeValue(new File(STATS_FILE), stats);
         } catch (IOException e) {
-            System.out.println("Erro ao guardar estatísticas: " + e.getMessage());
+            log.info("Erro ao guardar estatísticas: " + e.getMessage());
         }
     }
 
@@ -60,6 +63,6 @@ public class GameStatsRepository {
      */
     public static void reset() {
         save(new GameStats());
-        System.out.println("Estatísticas apagadas com sucesso!");
+        log.info("Estatísticas apagadas com sucesso!");
     }
 }

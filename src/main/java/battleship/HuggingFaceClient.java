@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import okhttp3.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.*;
@@ -17,6 +19,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class HuggingFaceClient {
 
+    private static final Logger log = LogManager.getLogger(HuggingFaceClient.class);
     private static String HF_TOKEN = loadToken();
     private static final String MODEL_URL = "https://router.huggingface.co/v1/chat/completions";
     private static final String MODEL_ID  = "meta-llama/Llama-3.1-8B-Instruct:cerebras";
@@ -97,7 +100,7 @@ public class HuggingFaceClient {
                         "\"Frota criada. Pronto para jogar!\"";
 
         callAPI(initMessage);
-        System.out.println("✅ IA criou a sua frota. Jogo pronto!");
+        log.info("✅ IA criou a sua frota. Jogo pronto!");
     }
 
     // -----------------------------------------------------------------------
@@ -222,9 +225,9 @@ public class HuggingFaceClient {
             requestBody.put("temperature", 0.3);
             requestBody.set("messages",    messages);
 
-            System.out.println("\n--- Mensagem enviada ao LLM ---");
-            System.out.println(userMessage);
-            System.out.println("-------------------------------\n");
+            log.info("\n--- Mensagem enviada ao LLM ---");
+            log.info(userMessage);
+            log.info("-------------------------------\n");
 
             // Fazer o pedido HTTP
             Request request = new Request.Builder()
@@ -248,9 +251,9 @@ public class HuggingFaceClient {
                             + "\nDetalhes: " + body);
                 }
 
-                System.out.println("--- Resposta bruta do LLM ---");
-                System.out.println(body);
-                System.out.println("-----------------------------\n");
+                log.info("--- Resposta bruta do LLM ---");
+                log.info(body);
+                log.info("-----------------------------\n");
 
                 // Extrair o conteúdo da resposta (formato OpenAI)
                 JsonNode root = mapper.readTree(body);
@@ -284,7 +287,7 @@ public class HuggingFaceClient {
     private static List<IPosition> parseShots(String content) {
         try {
             String jsonArray = extractJson(content, '[', ']');
-            System.out.println("Rajada da IA: " + jsonArray);
+            log.info("Rajada da IA: " + jsonArray);
 
             ArrayNode shotsNode = (ArrayNode) mapper.readTree(jsonArray);
             List<IPosition> shots = new ArrayList<>();
@@ -327,7 +330,7 @@ public class HuggingFaceClient {
             String jsonObject;
             if (end == -1) {
                 // JSON truncado — tentar completar
-                System.out.println("⚠️ JSON truncado, a tentar completar...");
+                log.info("⚠️ JSON truncado, a tentar completar...");
                 String truncated = content.substring(start);
                 // Fechar arrays abertos
                 long openBrackets = 0;
@@ -343,7 +346,7 @@ public class HuggingFaceClient {
                 jsonObject = content.substring(start, end);
             }
 
-            System.out.println("Resultado da frota da IA: " + jsonObject);
+            log.info("Resultado da frota da IA: " + jsonObject);
 
             // Validar JSON
             mapper.readTree(jsonObject);
@@ -351,7 +354,7 @@ public class HuggingFaceClient {
 
         } catch (Exception e) {
             // Fallback — assumir tiros na água
-            System.out.println("⚠️ Erro ao interpretar resposta, assumindo tiros na água.");
+            log.info("⚠️ Erro ao interpretar resposta, assumindo tiros na água.");
             return "{\"validShots\":3,\"sunkBoats\":[],\"repeatedShots\":0," +
                     "\"outsideShots\":0,\"hitsOnBoats\":[],\"missedShots\":3}";
         }
