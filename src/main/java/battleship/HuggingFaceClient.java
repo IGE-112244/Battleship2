@@ -17,11 +17,11 @@ import java.util.concurrent.TimeUnit;
  */
 public class HuggingFaceClient {
 
-    private static final String HF_TOKEN = System.getenv("HF_TOKEN");
+    private static String HF_TOKEN = loadToken();
     private static final String MODEL_URL = "https://router.huggingface.co/v1/chat/completions";
     private static final String MODEL_ID  = "meta-llama/Llama-3.1-8B-Instruct:cerebras";
     private static final MediaType JSON_TYPE = MediaType.get("application/json; charset=utf-8");
-    private static final OkHttpClient httpClient = new OkHttpClient.Builder()
+    private static OkHttpClient httpClient = new OkHttpClient.Builder()
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)
             .build();
@@ -226,7 +226,7 @@ public class HuggingFaceClient {
             // Fazer o pedido HTTP
             Request request = new Request.Builder()
                     .url(MODEL_URL)
-                    .addHeader("Authorization", "Bearer " + HF_TOKEN)
+                    .addHeader("Authorization", "Bearer " + loadToken())
                     .addHeader("Content-Type",  "application/json")
                     .post(RequestBody.create(mapper.writeValueAsString(requestBody), JSON_TYPE))
                     .build();
@@ -327,9 +327,12 @@ public class HuggingFaceClient {
                 System.out.println("⚠️ JSON truncado, a tentar completar...");
                 String truncated = content.substring(start);
                 // Fechar arrays abertos
-                long openBrackets  = truncated.chars().filter(c -> c == '[').count();
-                long closeBrackets = truncated.chars().filter(c -> c == ']').count();
-                StringBuilder fixed = new StringBuilder(truncated);
+                long openBrackets = 0;
+                long closeBrackets = 0;
+                for (char c : truncated.toCharArray()) {
+                    if (c == '[') openBrackets++;
+                    if (c == ']') closeBrackets++;
+                }StringBuilder fixed = new StringBuilder(truncated);
                 for (long i = 0; i < openBrackets - closeBrackets; i++) fixed.append("]");
                 fixed.append("}");
                 jsonObject = fixed.toString();
@@ -362,16 +365,20 @@ public class HuggingFaceClient {
         return text.substring(start, end);
     }
 
+    static String getEnvToken() {
+        return System.getenv("HF_TOKEN");
+    }
+
     private static String loadToken() {
+        String envToken = getEnvToken();
+        if (envToken != null) return envToken;
+
         try {
             java.util.Properties props = new java.util.Properties();
             props.load(new java.io.FileReader("config.properties"));
-            String token = props.getProperty("HF_TOKEN");
-            System.out.println("Token carregado: " + token.substring(0, 5) + "...");
-            return token;
+            return props.getProperty("HF_TOKEN");
         } catch (Exception e) {
-            System.out.println("Erro ao carregar token: " + e.getMessage());
-            return System.getenv("HF_TOKEN");
+            return null;
         }
     }
 }
