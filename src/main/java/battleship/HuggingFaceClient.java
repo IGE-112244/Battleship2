@@ -19,6 +19,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class HuggingFaceClient {
 
+    public static final String CONTENT = "content";
     private static final Logger log = LogManager.getLogger(HuggingFaceClient.class);
     private static String HF_TOKEN = loadToken();
     private static final String MODEL_URL = "https://router.huggingface.co/v1/chat/completions";
@@ -203,7 +204,7 @@ public class HuggingFaceClient {
             if (systemPrompt != null) {
                 ObjectNode systemMsg = mapper.createObjectNode();
                 systemMsg.put("role",    "system");
-                systemMsg.put("content", systemPrompt);
+                systemMsg.put(CONTENT, systemPrompt);
                 messages.add(systemMsg);
             }
 
@@ -215,7 +216,7 @@ public class HuggingFaceClient {
             // 3. Nova mensagem do utilizador
             ObjectNode userMsg = mapper.createObjectNode();
             userMsg.put("role",    "user");
-            userMsg.put("content", userMessage);
+            userMsg.put(CONTENT, userMessage);
             messages.add(userMsg);
 
             // Construir o body do pedido
@@ -258,18 +259,18 @@ public class HuggingFaceClient {
                 // Extrair o conteúdo da resposta (formato OpenAI)
                 JsonNode root = mapper.readTree(body);
                 String assistantContent = root.get("choices").get(0)
-                        .get("message").get("content").asText();
+                        .get("message").get(CONTENT).asText();
 
                 // Guardar a mensagem do utilizador no histórico
                 ObjectNode userHistory = mapper.createObjectNode();
                 userHistory.put("role",    "user");
-                userHistory.put("content", userMessage);
+                userHistory.put(CONTENT, userMessage);
                 conversationHistory.add(userHistory);
 
                 // Guardar a resposta da IA no histórico
                 ObjectNode assistantHistory = mapper.createObjectNode();
                 assistantHistory.put("role",    "assistant");
-                assistantHistory.put("content", assistantContent);
+                assistantHistory.put(CONTENT, assistantContent);
                 conversationHistory.add(assistantHistory);
 
                 return assistantContent;
