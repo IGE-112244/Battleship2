@@ -444,21 +444,21 @@ class HuggingFaceClientTest {
     @Test
     @DisplayName("loadToken() should return null when config.properties throws exception")
     void loadTokenException() throws Exception {
-        try (MockedStatic<HuggingFaceClient> mockedClient =
-                     Mockito.mockStatic(HuggingFaceClient.class, Mockito.CALLS_REAL_METHODS)) {
+        // Guardar e apagar config.properties ANTES do mock
+        java.io.File configFile = new java.io.File("config.properties");
+        String originalContent = null;
+        if (configFile.exists()) {
+            originalContent = new String(java.nio.file.Files.readAllBytes(configFile.toPath()));
+            configFile.delete();
+        }
 
-            // Simular que não há variável de ambiente
-            mockedClient.when(HuggingFaceClient::getEnvToken).thenReturn(null);
+        try {
+            try (MockedStatic<HuggingFaceClient> mockedClient =
+                         Mockito.mockStatic(HuggingFaceClient.class, Mockito.CALLS_REAL_METHODS)) {
 
-            // Garantir que config.properties não existe
-            java.io.File configFile = new java.io.File("config.properties");
-            String originalContent = null;
-            if (configFile.exists()) {
-                originalContent = new String(java.nio.file.Files.readAllBytes(configFile.toPath()));
-                configFile.delete(); // apagar temporariamente
-            }
+                // Simular que não há variável de ambiente
+                mockedClient.when(HuggingFaceClient::getEnvToken).thenReturn(null);
 
-            try {
                 Method method = HuggingFaceClient.class
                         .getDeclaredMethod("loadToken");
                 method.setAccessible(true);
@@ -466,12 +466,12 @@ class HuggingFaceClientTest {
                 Object result = method.invoke(null);
                 assertNull(result,
                         "Error: loadToken() should return null when config.properties is missing.");
-
-            } finally {
-                if (originalContent != null) {
-                    try (java.io.FileWriter fw = new java.io.FileWriter(configFile)) {
-                        fw.write(originalContent);
-                    }
+            }
+        } finally {
+            // SEMPRE restaurar o config.properties original
+            if (originalContent != null) {
+                try (java.io.FileWriter fw = new java.io.FileWriter(configFile)) {
+                    fw.write(originalContent);
                 }
             }
         }
@@ -867,6 +867,8 @@ class HuggingFaceClientTest {
         assertNotNull(result,
                 "Error: parseResult() should return non-null.");
     }
+
+
 
 
 }
