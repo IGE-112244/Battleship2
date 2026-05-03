@@ -123,10 +123,10 @@ public class GameJsonExporter {
         StringBuilder sb = new StringBuilder();
         if (hits > 0)     sb.append(hits).append(" acerto(s)");
         if (sunk > 0)     sb.append(" [").append(sunkNames).append(" ao fundo]");
-        if (misses > 0)   { if (sb.length() > 0) sb.append(" | "); sb.append(misses).append(" água"); }
-        if (repeated > 0) { if (sb.length() > 0) sb.append(" | "); sb.append(repeated).append(" repetido(s)"); }
-        if (invalid > 0)  { if (sb.length() > 0) sb.append(" | "); sb.append(invalid).append(" inválido(s)"); }
-        if (sb.length() == 0) sb.append("Sem resultado");
+        if (misses > 0)   { if (!sb.isEmpty()) sb.append(" | "); sb.append(misses).append(" água"); }
+        if (repeated > 0) { if (!sb.isEmpty()) sb.append(" | "); sb.append(repeated).append(" repetido(s)"); }
+        if (invalid > 0)  { if (!sb.isEmpty()) sb.append(" | "); sb.append(invalid).append(" inválido(s)"); }
+        if (sb.isEmpty()) sb.append("Sem resultado");
 
         return sb.toString();
     }

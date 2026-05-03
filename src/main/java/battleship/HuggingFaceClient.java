@@ -406,8 +406,11 @@ public class HuggingFaceClient {
         try {
             java.util.Properties props = new java.util.Properties();
             props.load(new java.io.FileReader("config.properties"));
-            return props.getProperty("HF_TOKEN");
+            String token = props.getProperty("HF_TOKEN");
+            System.out.println("Token lido: " + (token != null ? token.substring(0, 5) + "..." : "null"));
+            return token;
         } catch (Exception e) {
+            System.out.println("Erro ao ler config: " + e.getMessage());
             return null;
         }
     }
