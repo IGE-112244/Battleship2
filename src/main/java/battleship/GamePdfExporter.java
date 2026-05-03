@@ -2,6 +2,8 @@ package battleship;
 
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.awt.Color;
 import java.io.FileOutputStream;
@@ -15,6 +17,8 @@ import java.util.List;
      * Utiliza a biblioteca OpenPDF (com.github.librepdf:openpdf).
      */
     public class GamePdfExporter {
+
+        private static final Logger LOGGER = LogManager.getLogger();
 
         // Cores do tema naval
         private static final Color COLOR_NAVY     = new Color(10, 36, 99);
@@ -59,7 +63,7 @@ import java.util.List;
                 addMovesTable(document, game.getMyMoves(), "As Minhas Jogadas (tiros no tabuleiro inimigo)");
 
                 document.close();
-                System.out.println("PDF exportado com sucesso: " + filePath);
+                LOGGER.info("PDF exportado com sucesso: {}", filePath);
 
             } catch (DocumentException | IOException e) {
                 throw new RuntimeException("Erro ao gerar o PDF: " + e.getMessage(), e);
