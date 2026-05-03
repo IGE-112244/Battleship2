@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -220,12 +221,12 @@ public class HuggingFaceClient {
                 // Lê SEMPRE o body, mesmo em caso de erro
                 ResponseBody responseBody = response.body();
                 if (responseBody == null) {
-                    throw new RuntimeException("Resposta da API sem corpo (body null)");
+                    throw new IllegalStateException("Resposta da API sem corpo (body null)");
                 }
                 String body = responseBody.string();
 
                 if (!response.isSuccessful()) {
-                    throw new RuntimeException("Erro na API do Hugging Face: "
+                    throw new IllegalStateException("Erro na API do Hugging Face: "
                             + response.code() + " - " + response.message()
                             + "\nDetalhes: " + body);
                 }
@@ -255,7 +256,7 @@ public class HuggingFaceClient {
             }
 
         } catch (IOException e) {
-            throw new RuntimeException("Erro ao comunicar com o Hugging Face: " + e.getMessage(), e);
+            throw new UncheckedIOException("Erro ao comunicar com o Hugging Face: " + e.getMessage(), e);
         }
     }
 
@@ -311,14 +312,14 @@ public class HuggingFaceClient {
             }
 
             if (shots.size() != Game.NUMBER_SHOTS) {
-                throw new RuntimeException("A IA devolveu " + shots.size()
+                throw new IllegalStateException("A IA devolveu " + shots.size()
                         + " tiros em vez de " + Game.NUMBER_SHOTS);
             }
 
             return shots;
 
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao interpretar rajada da IA: " + e.getMessage(), e);
+            throw new IllegalStateException("Erro ao interpretar rajada da IA: " + e.getMessage(), e);
         }
     }
 
@@ -327,7 +328,7 @@ public class HuggingFaceClient {
             // Encontrar início do JSON
             int start = content.indexOf('{');
             if (start == -1) {
-                throw new RuntimeException("Sem JSON na resposta: " + content);
+                throw new IllegalStateException("Sem JSON na resposta: " + content);
             }
 
             // Reconstruir JSON válido contando chavetas
@@ -389,7 +390,7 @@ public class HuggingFaceClient {
         int end   = text.lastIndexOf(close) + 1;
 
         if (start == -1 || end == 0) {
-            throw new RuntimeException("Não foi encontrado JSON válido na resposta da IA:\n" + text);
+            throw new IllegalStateException("Não foi encontrado JSON válido na resposta da IA:\n" + text);
         }
 
         return text.substring(start, end);
