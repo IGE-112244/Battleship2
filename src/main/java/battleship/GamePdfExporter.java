@@ -236,7 +236,11 @@ import java.util.List;
         private static String buildResultText(List<IGame.ShotResult> results) {
             if (results == null || results.isEmpty()) return "—";
 
-            int hits = 0, misses = 0, repeated = 0, invalid = 0, sunk = 0;
+            int hits = 0;
+            int misses = 0;
+            int repeated = 0;
+            int invalid = 0;
+            int sunk = 0;
             StringBuilder sunkNames = new StringBuilder();
 
             for (IGame.ShotResult r : results) {
