@@ -92,7 +92,8 @@ public class Move implements IMove {
 				}
 
 				// Atualizar lógica para contar múltiplos barcos afundados do mesmo tipo
-				if (!sunkBoatsCount.isEmpty()) {
+				boolean hasSunkBoats = !sunkBoatsCount.isEmpty();
+				if (hasSunkBoats) {
 					for (Map.Entry<String, Integer> entry : sunkBoatsCount.entrySet()) {
 						String boatName = entry.getKey();
 						int count = entry.getValue();
@@ -100,11 +101,13 @@ public class Move implements IMove {
 					}
 				}
 
-				if (!hitsPerBoat.isEmpty()) {
+				boolean hasHits = !hitsPerBoat.isEmpty();
+				if (hasHits) {
 					for (Map.Entry<String, Integer> entry : hitsPerBoat.entrySet()) {
 						String boatName = entry.getKey();
 						int hits = entry.getValue();
-						if (!sunkBoatsCount.containsKey(boatName)) {
+						boolean boatNotSunk = !sunkBoatsCount.containsKey(boatName);
+						if (boatNotSunk) {
 							output.append(hits).append(TIRO).append(hits > 1 ? "s" : "").append(" num(a) ").append(boatName).append(" + ");
 						}
 					}
@@ -112,7 +115,7 @@ public class Move implements IMove {
 
 				if (result.missedShots() > 0) {
 					output.append(result.missedShots()).append(TIRO).append(result.missedShots() > 1 ? "s" : "").append(" na água");
-				} else if (!sunkBoatsCount.isEmpty() || !hitsPerBoat.isEmpty()) {
+				} else if (hasSunkBoats || hasHits) {
 					output.setLength(output.length() - 2); // Remover o "+" final
 				}
 
@@ -192,7 +195,8 @@ public class Move implements IMove {
 
 	private @NotNull processShotResults getProcessShotResults(int repeatedShots, int validShots, int missedShots, Map<String, Integer> hitsPerBoat, Map<String, Integer> sunkBoatsCount) {
 		for (IGame.ShotResult result : this.shotResults) {
-			if (!result.valid()) {
+			boolean isInvalidShot = !result.valid();
+			if (isInvalidShot) {
 				// Tiro inválido - apenas ignorar
 				continue;
 			}
