@@ -63,7 +63,7 @@ class HuggingFaceClientTest {
     }
 
     @AfterAll
-    static void tearDownClass() throws Exception {
+    static void tearDownClass() {
         new java.io.File("config.properties").delete();
     }
 
