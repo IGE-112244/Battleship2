@@ -34,7 +34,6 @@ import java.util.List;
         private static final Font FONT_SUBTITLE   = new Font(Font.HELVETICA, 11, Font.ITALIC, COLOR_OCEAN);
         private static final Font FONT_SECTION    = new Font(Font.HELVETICA, 13, Font.BOLD,   COLOR_NAVY);
         private static final Font FONT_TABLE_HDR  = new Font(Font.HELVETICA, 10, Font.BOLD,   COLOR_WHITE);
-        private static final Font FONT_TABLE_BODY = new Font(Font.HELVETICA,  9, Font.NORMAL, Color.DARK_GRAY);
         private static final Font FONT_SUMMARY    = new Font(Font.HELVETICA, 10, Font.NORMAL, Color.DARK_GRAY);
         private static final Font FONT_SUMMARY_V  = new Font(Font.HELVETICA, 10, Font.BOLD,   COLOR_NAVY);
 
