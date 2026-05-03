@@ -8,8 +8,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -42,7 +40,6 @@ public class Tasks {
 	private static final String SIMULA = "simula";
 	private static final String RAJADAJSON = "rajadajson";
 	private static final String EXPORTJSON = "exportjson";
-	private static final String IAJOGO   = "iajogo";
 	private static final String IAJOGO2P = "iajogo2p";
 	private static final String STATS = "stats";
 	private static final String RESETSTATS = "resetstats";

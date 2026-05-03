@@ -36,9 +36,6 @@ public class HuggingFaceClient {
     // System prompt com as regras e estratégia do jogo
     private static String systemPrompt = null;
 
-    // Frota da IA (posições declaradas no início)
-    private static String aiFleetJson = null;
-
     // Posições já disparadas pela IA
     private static final Set<String> aiShotHistory = new LinkedHashSet<>();
     private static final Map<String, String> aiShotResults = new LinkedHashMap<>();
@@ -93,7 +90,6 @@ public class HuggingFaceClient {
     public static void initGame() {
         conversationHistory.clear();
         aiShotHistory.clear();
-        aiFleetJson = null;
 
         String initMessage =
                 "Antes de começar o jogo, cria agora a tua frota secreta de 11 navios " +
