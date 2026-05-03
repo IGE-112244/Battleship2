@@ -29,7 +29,7 @@ import java.util.ArrayList;
  * - isInsideBoard: 3
  * - colisionRisk: 2
  */
-	public class FleetTest {
+	class FleetTest {
 
 		private Fleet fleet;
 
