@@ -79,7 +79,7 @@ public class GalleonTest {
 	 */
 	@Test
 	void testStillFloating2() {
-		galleon.getPositions().forEach(pos -> pos.shoot());
+		galleon.getPositions().forEach(IPosition::shoot);
 		assertFalse(galleon.stillFloating(), "Error: Galleon should not float when all positions are hit.");
 	}
 

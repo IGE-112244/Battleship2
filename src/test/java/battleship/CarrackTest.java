@@ -135,7 +135,7 @@ public class CarrackTest {
      */
     @Test
     void testStillFloating3() {
-        carrack.getPositions().forEach(position -> position.shoot());
+        carrack.getPositions().forEach(IPosition::shoot);
         assertFalse(carrack.stillFloating(), "Error: Carrack should not be floating when all positions are hit.");
     }
 
