@@ -3,6 +3,8 @@ package battleship;
 // CRIADO PARA RESOLVER A ISSUE #7
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +21,7 @@ public class GameJsonExporter {
     private GameJsonExporter() {
         // Utility class — prevent instantiation
     }
+    private static final Logger LOGGER = LogManager.getLogger();
     /**
      * Exporta o histórico completo do jogo para um ficheiro JSON no caminho indicado.
      *
@@ -59,7 +62,7 @@ public class GameJsonExporter {
         // Escrever para ficheiro
         try {
             objectMapper.writeValue(new File(filePath), root);
-            System.out.println("JSON exportado com sucesso: " + filePath);
+            LOGGER.info("JSON exportado com sucesso: {}", filePath);
         } catch (IOException e) {
             throw new RuntimeException("Erro ao exportar o JSON: " + e.getMessage(), e);
         }
