@@ -172,8 +172,8 @@ public class Game implements IGame
 	{
 		this.moveNumber = 1;
 
-		this.alienMoves = new ArrayList<IMove>();
-		this.myMoves = new ArrayList<IMove>();
+		this.alienMoves = new ArrayList<>();
+		this.myMoves = new ArrayList<>();
 
 		this.alienFleet = new Fleet();
 		this.myFleet = myFleet;
@@ -225,7 +225,7 @@ public class Game implements IGame
 		List<IPosition> candidateShots = buildCandidateShots();
 
 		// Criar lista para armazenar os tiros
-		List<IPosition> shots = new ArrayList<IPosition>();
+		List<IPosition> shots = new ArrayList<>();
 
 		System.out.println();
 		// Gerar coordenadas únicas até atingir o número definido por NUMBER_SHOTS
@@ -338,12 +338,12 @@ public class Game implements IGame
 	{
 		if (shots == null) throw new IllegalArgumentException("shots must not be null");
 
-		List<ShotResult> shotResults = new ArrayList<ShotResult>();
+		List<ShotResult> shotResults = new ArrayList<>();
 		if (shots.size() != NUMBER_SHOTS) {
 			throw new IllegalArgumentException("Must fire exactly " + NUMBER_SHOTS + " shots per move.");
 		}
 
-		List<IPosition> alreadyShot = new ArrayList<IPosition>();
+		List<IPosition> alreadyShot = new ArrayList<>();
 		for (IPosition pos : shots) {
 			shotResults.add(fireSingleShot(pos, alreadyShot.contains(pos)));
 			alreadyShot.add(pos);

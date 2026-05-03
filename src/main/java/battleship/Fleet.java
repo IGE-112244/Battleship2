@@ -142,7 +142,7 @@ public class Fleet implements IFleet
     @Override
     public List<IShip> getFloatingShips()
     {
-		List<IShip> floatingShips = new ArrayList<IShip>();
+		List<IShip> floatingShips = new ArrayList<>();
 		for (IShip s : ships)
 			if (s.stillFloating())
 				floatingShips.add(s);
@@ -163,7 +163,7 @@ public class Fleet implements IFleet
 	@Override
 	public List<IShip> getSunkShips()
 	{
-		List<IShip> sunkShips = new ArrayList<IShip>();
+		List<IShip> sunkShips = new ArrayList<>();
 		for (IShip s : ships)
 			if (!s.stillFloating())
 				sunkShips.add(s);
