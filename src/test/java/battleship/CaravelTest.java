@@ -111,13 +111,22 @@ class CaravelTest {
 	@Test
 	@DisplayName("Test for the constructor with null values")
 	void constructorNullPointerException() {
-		Exception exception = assertThrows(NullPointerException.class, () ->
-				new Caravel(null, new Position(0, 0)), "Error: A NullPointerException should have been thrown for a null direction.");
+		org.junit.jupiter.api.function.Executable caravelNullBearing =
+				() -> new Caravel(null, new Position(0, 0));
+
+		Exception exception = assertThrows(NullPointerException.class,
+				caravelNullBearing,
+				"Error: A NullPointerException should have been thrown for a null direction.");
 		assertEquals("Ship's bearing must not be null", exception.getMessage(),
 				"Error: The exception message does not match the expected value.");
 
-		Exception exception2 = assertThrows(NullPointerException.class, () ->
-				new Caravel(null, null), "Error: A NullPointerException should have been thrown for null direction and position.");
+		// Lambda 2 — extraída para variável
+		org.junit.jupiter.api.function.Executable caravelNullBearingAndPos =
+				() -> new Caravel(null, null);
+
+		Exception exception2 = assertThrows(NullPointerException.class,
+				caravelNullBearingAndPos,
+				"Error: A NullPointerException should have been thrown for null direction and position.");
 		assertEquals("Ship's bearing must not be null", exception2.getMessage(),
 				"Error: The exception message does not match the expected value.");
 	}

@@ -197,9 +197,18 @@ class CarrackTest {
      */
     @Test
     void testConstructorWithInvalidInput() {
-        assertThrows(NullPointerException.class, () -> new Carrack(null, new Position(5, 5)),
+        org.junit.jupiter.api.function.Executable carrackNullBearing =
+                () -> new Carrack(null, new Position(5, 5));
+
+        org.junit.jupiter.api.function.Executable carrackNullPosition =
+                () -> new Carrack(Compass.NORTH, null);
+
+        assertThrows(NullPointerException.class,
+                carrackNullBearing,
                 "Error: Should throw NullPointerException for null bearing.");
-        assertThrows(NullPointerException.class, () -> new Carrack(Compass.NORTH, null),
+
+        assertThrows(NullPointerException.class,
+                carrackNullPosition,
                 "Error: Should throw NullPointerException for null position.");
     }
 }
