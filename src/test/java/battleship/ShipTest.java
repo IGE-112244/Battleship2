@@ -31,7 +31,7 @@ import java.util.List;
  * - getRightMostPos: 2
  * - toString: 1
  */
-public class ShipTest {
+ class ShipTest {
 
     private Ship ship;
 

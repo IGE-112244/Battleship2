@@ -109,10 +109,14 @@ class MoveTest {
         }
 
         @Override
-        public void shoot(IPosition pos) {}
+        public void shoot(IPosition pos) {
+            // Not implemented: stub method for testing purposes
+        }
 
         @Override
-        public void sink() {}
+        public void sink() {
+            // Not implemented: stub method for testing purposes
+        }
     }
 
     private IGame.ShotResult shot(boolean valid, boolean repeated, IShip ship, boolean sunk) {

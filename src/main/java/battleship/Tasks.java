@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,10 +18,13 @@ import org.jetbrains.annotations.NotNull;
  * The type Tasks.
  */
 public class Tasks {
+	private Tasks() {}
 	/**
 	 * The constant LOGGER.
 	 */
 	private static final Logger LOGGER = LogManager.getLogger();
+
+	private static final String PDF_EXTENSION = ".pdf";
 
 	/**
 	 * The constant GOODBYE_MESSAGE.
@@ -91,7 +97,7 @@ public class Tasks {
 						if (game.getRemainingShips() == 0) {
 							game.over();
                             BoardVisualizer.fechar();                                  // fecha a janela
-							String pdfFile = "historico_partida_" + System.currentTimeMillis() + ".pdf";
+							String pdfFile = "historico_partida_" + System.currentTimeMillis() + PDF_EXTENSION;
 							GamePdfExporter.export(game, pdfFile);
 							System.out.println("Histórico exportado para: " + pdfFile);
 							String jsonFile = "historico_partida_" + System.currentTimeMillis() + ".json";
@@ -108,36 +114,34 @@ public class Tasks {
 					}
 					break;
 				case SIMULA:
+
 					if (game != null) {
-						while (game.getRemainingShips() > 0) {
-							game.randomEnemyFire();
-							myFleet.printStatus();
-							game.printMyBoard(true, false);
-							BoardVisualizer.atualizar(myFleet, game.getAlienMoves(), true); // atualiza a cada jogada
-							try {
-								Thread.sleep(3000);
-							} catch (InterruptedException e) {
-								Thread.currentThread().interrupt();
+						ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+
+						IFleet finalMyFleet = myFleet;
+						IGame finalGame = game;
+						Runnable simulationStep = new Runnable() {
+							@Override
+							public void run() {
+								if (finalGame.getRemainingShips() > 0) {
+									// Jogo em curso — disparar rajada aleatória
+									finalGame.randomEnemyFire();
+									finalMyFleet.printStatus();
+									finalGame.printMyBoard(true, false);
+									BoardVisualizer.atualizar(finalMyFleet, finalGame.getAlienMoves(), true);
+								} else {
+									// Jogo terminado — exportar e terminar
+									executor.shutdown();
+									finalGame.over();
+									BoardVisualizer.fechar();
+									exportAndSaveStats(finalGame);
+									System.exit(0);
+								}
 							}
-						}
+						};
 
-						if (game.getRemainingShips() == 0) {
-							game.over();
-							String pdfFile = "historico_partida_" + System.currentTimeMillis() + ".pdf";
-							GamePdfExporter.export(game, pdfFile);
-							System.out.println("Histórico exportado para: " + pdfFile);
-							String jsonFile = "historico_partida_" + System.currentTimeMillis() + ".json";
-							GameJsonExporter.export(game, jsonFile);
-							System.out.println("Histórico exportado para: " + jsonFile);
-							BoardVisualizer.fechar();                                    // fecha a janela
-
-							GameStats stats = GameStatsRepository.load();
-							stats.update(game, true); // true = jogador ganhou
-							GameStatsRepository.save(stats);
-							GameStatsPanel.mostrar();
-
-							System.exit(0);
-						}
+						// Executa de 3 em 3 segundos sem busy-waiting
+						executor.scheduleAtFixedRate(simulationStep, 0, 3, TimeUnit.SECONDS);
 					}
 					break;
 				case TIROS:
@@ -165,7 +169,7 @@ public class Tasks {
 						if (game.getRemainingShips() == 0) {
 							game.over();
 							BoardVisualizer.fechar();
-							String pdfFile = "historico_partida_" + System.currentTimeMillis() + ".pdf";
+							String pdfFile = "historico_partida_" + System.currentTimeMillis() + PDF_EXTENSION;
 							GamePdfExporter.export(game, pdfFile);
 							String jsonFile = "historico_partida_" + System.currentTimeMillis() + ".json";
 							GameJsonExporter.export(game, jsonFile);
@@ -296,13 +300,9 @@ public class Tasks {
 								for (IGame.ShotResult r : myResults) {
 									if (!r.valid()) {
 										resultMsg.append("❌ Tiro fora do tabuleiro!\n");
-										continue;
-									}
-									if (r.repeated()) {
+									} else if (r.repeated()) {
 										resultMsg.append("🔄 Tiro repetido!\n");
-										continue;
-									}
-									if (r.ship() != null) {
+									} else if (r.ship() != null) {
 										if (r.sunk()) {
 											aiShipsRemaining[0]--;
 											resultMsg.append("🔥 Afundaste: ")
@@ -358,7 +358,7 @@ public class Tasks {
 
 	private static void exportAndSaveStats(IGame game) {
 
-			String pdfFile  = "historico_partida_" + System.currentTimeMillis() + ".pdf";
+			String pdfFile  = "historico_partida_" + System.currentTimeMillis() + PDF_EXTENSION;
 			String jsonFile = "historico_partida_" + System.currentTimeMillis() + ".json";
 			GamePdfExporter.export(game, pdfFile);
 			System.out.println("Histórico PDF exportado para: " + pdfFile);

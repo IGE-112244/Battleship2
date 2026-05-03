@@ -15,6 +15,8 @@ public class GameStatsPanel {
 
     private static JFrame frame;
 
+    private static final String FONT_NAME = "SansSerif";
+
     /**
      * Abre (ou atualiza) o painel de estatísticas com os dados atuais.
      * Se o painel já estiver aberto, fecha e reabre com dados atualizados.
@@ -93,7 +95,7 @@ public class GameStatsPanel {
         resetButton.setBackground(new Color(180, 40, 40));
         resetButton.setForeground(Color.WHITE);
         resetButton.setFocusPainted(false);
-        resetButton.setFont(new Font("SansSerif", Font.BOLD, 13));
+        resetButton.setFont(new Font(FONT_NAME, Font.BOLD, 13));
         resetButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         resetButton.addActionListener(e -> {
             int confirm = JOptionPane.showConfirmDialog(
@@ -144,11 +146,11 @@ public class GameStatsPanel {
 
         JLabel labelComp = new JLabel(label, SwingConstants.CENTER);
         labelComp.setForeground(new Color(170, 200, 240));
-        labelComp.setFont(new Font("SansSerif", Font.PLAIN, 12));
+        labelComp.setFont(new Font(FONT_NAME, Font.PLAIN, 12));
 
         JLabel valueComp = new JLabel(value, SwingConstants.CENTER);
         valueComp.setForeground(Color.WHITE);
-        valueComp.setFont(new Font("SansSerif", Font.BOLD, 28));
+        valueComp.setFont(new Font(FONT_NAME, Font.BOLD, 28));
 
         card.add(labelComp, BorderLayout.NORTH);
         card.add(valueComp, BorderLayout.CENTER);

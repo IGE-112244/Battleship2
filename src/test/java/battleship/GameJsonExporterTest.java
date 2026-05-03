@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * - buildMovesList(): 4
  * - buildResultText(): 10
  */
-public class GameJsonExporterTest {
+class GameJsonExporterTest {
 
     private Game game;
     private String testFilePath;
