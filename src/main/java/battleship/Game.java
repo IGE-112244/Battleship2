@@ -384,6 +384,10 @@ public class Game implements IGame
 			return new ShotResult(true, true, null, false);
 		}
 
+		return processHit(pos);
+	}
+
+	private @NotNull ShotResult processHit(IPosition pos) {
 		IShip ship = myFleet.shipAt(pos);
 		if (ship == null)
 			return new ShotResult(true, false, null, false);
