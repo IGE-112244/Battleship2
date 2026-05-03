@@ -117,23 +117,20 @@ public class Tasks {
 
 						IFleet finalMyFleet = myFleet;
 						IGame finalGame = game;
-						Runnable simulationStep = new Runnable() {
-							@Override
-							public void run() {
-								if (finalGame.getRemainingShips() > 0) {
-									// Jogo em curso — disparar rajada aleatória
-									finalGame.randomEnemyFire();
-									finalMyFleet.printStatus();
-									finalGame.printMyBoard(true, false);
-									BoardVisualizer.atualizar(finalMyFleet, finalGame.getAlienMoves(), true);
-								} else {
-									// Jogo terminado — exportar e terminar
-									executor.shutdown();
-									finalGame.over();
-									BoardVisualizer.fechar();
-									exportAndSaveStats(finalGame);
-									System.exit(0);
-								}
+						Runnable simulationStep = () -> {
+							if (finalGame.getRemainingShips() > 0) {
+								// Jogo em curso — disparar rajada aleatória
+								finalGame.randomEnemyFire();
+								finalMyFleet.printStatus();
+								finalGame.printMyBoard(true, false);
+								BoardVisualizer.atualizar(finalMyFleet, finalGame.getAlienMoves(), true);
+							} else {
+								// Jogo terminado — exportar e terminar
+								executor.shutdown();
+								finalGame.over();
+								BoardVisualizer.fechar();
+								exportAndSaveStats(finalGame);
+								System.exit(0);
 							}
 						};
 
