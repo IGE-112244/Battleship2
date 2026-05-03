@@ -6,6 +6,8 @@ import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.List;
@@ -18,6 +20,8 @@ import java.util.List;
  */
 public class BoardVisualizer {
     private BoardVisualizer() {}
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static Screen screen = null;
 
@@ -33,7 +37,7 @@ public class BoardVisualizer {
             screen = new TerminalScreen(terminal);
             screen.startScreen();
         } catch (IOException e) {
-            System.err.println("Erro ao iniciar visualização: " + e.getMessage());
+            LOGGER.error("Erro ao iniciar visualização: {}", e.getMessage());
         }
     }
 
@@ -94,7 +98,7 @@ public class BoardVisualizer {
             screen.refresh();
 
         } catch (IOException e) {
-            System.err.println("Erro ao atualizar visualização: " + e.getMessage());
+            LOGGER.error("Erro ao atualizar visualização: {}", e.getMessage());
         }
     }
 
@@ -213,7 +217,7 @@ public class BoardVisualizer {
                 screen.stopScreen();
                 screen = null;
             } catch (IOException e) {
-                System.err.println("Erro ao fechar visualização: " + e.getMessage());
+                LOGGER.error("Erro ao fechar visualização: {}", e.getMessage());
             }
         }
     }
