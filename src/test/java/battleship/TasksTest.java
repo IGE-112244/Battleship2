@@ -45,7 +45,7 @@ class TasksTest {
     @DisplayName("menu() should exit gracefully when input is 'desisto'")
     void menu() {
         System.setIn(new ByteArrayInputStream("desisto\n".getBytes()));
-        assertDoesNotThrow(() -> Tasks.menu(),
+        assertDoesNotThrow(Tasks::menu,
                 "Error: menu() should not throw when input is 'desisto'.");
     }
 
@@ -53,7 +53,7 @@ class TasksTest {
     @DisplayName("menu() should handle 'ajuda' command")
     void menuAjuda() {
         System.setIn(new ByteArrayInputStream("ajuda\ndesisto\n".getBytes()));
-        assertDoesNotThrow(() -> Tasks.menu(),
+        assertDoesNotThrow(Tasks::menu,
                 "Error: menu() should handle 'ajuda' without throwing.");
     }
 
@@ -61,7 +61,7 @@ class TasksTest {
     @DisplayName("menu() should handle 'estado' when fleet is null")
     void menuEstado() {
         System.setIn(new ByteArrayInputStream("estado\ndesisto\n".getBytes()));
-        assertDoesNotThrow(() -> Tasks.menu(),
+        assertDoesNotThrow(Tasks::menu,
                 "Error: menu() should handle 'estado' when fleet is null.");
     }
 
@@ -69,7 +69,7 @@ class TasksTest {
     @DisplayName("menu() should handle 'mapa' when fleet is null")
     void menuMapaNull() {
         System.setIn(new ByteArrayInputStream("mapa\ndesisto\n".getBytes()));
-        assertDoesNotThrow(() -> Tasks.menu(),
+        assertDoesNotThrow(Tasks::menu,
                 "Error: menu() should handle 'mapa' when fleet is null.");
     }
 
@@ -77,7 +77,7 @@ class TasksTest {
     @DisplayName("menu() should handle 'rajada' when game is null")
     void menuRajadaNull() {
         System.setIn(new ByteArrayInputStream("rajada\ndesisto\n".getBytes()));
-        assertDoesNotThrow(() -> Tasks.menu(),
+        assertDoesNotThrow(Tasks::menu,
                 "Error: menu() should handle 'rajada' when game is null.");
     }
 
@@ -85,7 +85,7 @@ class TasksTest {
     @DisplayName("menu() should handle 'simula' when game is null")
     void menuSimulaNull() {
         System.setIn(new ByteArrayInputStream("simula\ndesisto\n".getBytes()));
-        assertDoesNotThrow(() -> Tasks.menu(),
+        assertDoesNotThrow(Tasks::menu,
                 "Error: menu() should handle 'simula' when game is null.");
     }
 
@@ -93,7 +93,7 @@ class TasksTest {
     @DisplayName("menu() should handle 'tiros' when game is null")
     void menuTirosNull() {
         System.setIn(new ByteArrayInputStream("tiros\ndesisto\n".getBytes()));
-        assertDoesNotThrow(() -> Tasks.menu(),
+        assertDoesNotThrow(Tasks::menu,
                 "Error: menu() should handle 'tiros' when game is null.");
     }
 
@@ -101,7 +101,7 @@ class TasksTest {
     @DisplayName("menu() should handle 'exportjson' when game is null")
     void menuExportJsonNull() {
         System.setIn(new ByteArrayInputStream("exportjson\ndesisto\n".getBytes()));
-        assertDoesNotThrow(() -> Tasks.menu(),
+        assertDoesNotThrow(Tasks::menu,
                 "Error: menu() should handle 'exportjson' when game is null.");
     }
 
@@ -109,7 +109,7 @@ class TasksTest {
     @DisplayName("menu() should handle 'stats' command")
     void menuStats() {
         System.setIn(new ByteArrayInputStream("stats\ndesisto\n".getBytes()));
-        assertDoesNotThrow(() -> Tasks.menu(),
+        assertDoesNotThrow(Tasks::menu,
                 "Error: menu() should handle 'stats' without throwing.");
     }
 
@@ -117,7 +117,7 @@ class TasksTest {
     @DisplayName("menu() should handle 'resetstats' command")
     void menuResetStats() {
         System.setIn(new ByteArrayInputStream("resetstats\ndesisto\n".getBytes()));
-        assertDoesNotThrow(() -> Tasks.menu(),
+        assertDoesNotThrow(Tasks::menu,
                 "Error: menu() should handle 'resetstats' without throwing.");
     }
 
@@ -125,7 +125,7 @@ class TasksTest {
     @DisplayName("menu() should handle unknown command")
     void menuUnknown() {
         System.setIn(new ByteArrayInputStream("comandoinvalido\ndesisto\n".getBytes()));
-        assertDoesNotThrow(() -> Tasks.menu(),
+        assertDoesNotThrow(Tasks::menu,
                 "Error: menu() should handle unknown commands without throwing.");
     }
 
@@ -133,7 +133,7 @@ class TasksTest {
     @DisplayName("menu() should handle 'rajadajson' when game is null")
     void menuRajadaJsonNull() {
         System.setIn(new ByteArrayInputStream("rajadajson\ndesisto\n".getBytes()));
-        assertDoesNotThrow(() -> Tasks.menu(),
+        assertDoesNotThrow(Tasks::menu,
                 "Error: menu() should handle 'rajadajson' when game is null.");
     }
 
@@ -141,7 +141,7 @@ class TasksTest {
     @DisplayName("menu() should handle 'iajogo2p' when game is null")
     void menuIaJogo2pNull() {
         System.setIn(new ByteArrayInputStream("iajogo2p\ndesisto\n".getBytes()));
-        assertDoesNotThrow(() -> Tasks.menu(),
+        assertDoesNotThrow(Tasks::menu,
                 "Error: menu() should handle 'iajogo2p' when game is null.");
     }
 
@@ -152,7 +152,7 @@ class TasksTest {
     @Test
     @DisplayName("menuHelp() should not throw exceptions")
     void menuHelp() {
-        assertDoesNotThrow(() -> Tasks.menuHelp(),
+        assertDoesNotThrow(Tasks::menuHelp,
                 "Error: menuHelp() should not throw exceptions.");
     }
 
@@ -371,6 +371,20 @@ class TasksTest {
     }
 
     // -----------------------------------------------------------------------
+// readClassicPosition() - formato 'A 3' separado
+// -----------------------------------------------------------------------
+
+    @Test
+    @DisplayName("readClassicPosition() should parse 'A 3' with letter then integer")
+    void readClassicPosition6() {
+        // Este formato entra no segundo branch: part1=[A-Z] e part2=\d+
+        Scanner in = new Scanner(new ByteArrayInputStream("A 3\n".getBytes()));
+        IPosition pos = Tasks.readClassicPosition(in);
+        assertNotNull(pos,
+                "Error: readClassicPosition() should parse 'A 3' format correctly.");
+    }
+
+    // -----------------------------------------------------------------------
 // exportAndSaveStats() via reflection
 // -----------------------------------------------------------------------
 
@@ -487,19 +501,7 @@ class TasksTest {
                 "Error: readPosition() should throw AssertionError when scanner is null.");
     }
 
-// -----------------------------------------------------------------------
-// readClassicPosition() - formato 'A 3' separado
-// -----------------------------------------------------------------------
 
-    @Test
-    @DisplayName("readClassicPosition() should parse 'A 3' with letter then integer")
-    void readClassicPosition6() {
-        // Este formato entra no segundo branch: part1=[A-Z] e part2=\d+
-        Scanner in = new Scanner(new ByteArrayInputStream("A 3\n".getBytes()));
-        IPosition pos = Tasks.readClassicPosition(in);
-        assertNotNull(pos,
-                "Error: readClassicPosition() should parse 'A 3' format correctly.");
-    }
 
 // -----------------------------------------------------------------------
 // readPlayerShots() via reflection
@@ -552,7 +554,7 @@ class TasksTest {
             // por isso usamos lefrota em vez disso
             String input = "estado\ndesisto\n";
             System.setIn(new ByteArrayInputStream(input.getBytes()));
-            assertDoesNotThrow(() -> Tasks.menu(),
+            assertDoesNotThrow(Tasks::menu,
                     "Error: menu() should handle 'estado' with fleet.");
         }
     }

@@ -23,6 +23,10 @@ class GameStatsRepositoryTest {
     @BeforeEach
     void setUp() {
         // Garantir que não existe ficheiro de stats antes de cada teste
+        deleteStatsFile();
+    }
+
+    private static void deleteStatsFile() {
         File file = new File(STATS_FILE);
         if (file.exists()) file.delete();
     }
@@ -30,8 +34,7 @@ class GameStatsRepositoryTest {
     @AfterEach
     void tearDown() {
         // Limpar o ficheiro após cada teste
-        File file = new File(STATS_FILE);
-        if (file.exists()) file.delete();
+        deleteStatsFile();
     }
 
     // -----------------------------------------------------------------------

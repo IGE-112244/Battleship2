@@ -8,8 +8,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -45,10 +43,12 @@ public class Tasks {
 	private static final String SIMULA = "simula";
 	private static final String RAJADAJSON = "rajadajson";
 	private static final String EXPORTJSON = "exportjson";
-	private static final String IAJOGO   = "iajogo";
 	private static final String IAJOGO2P = "iajogo2p";
 	private static final String STATS = "stats";
 	private static final String RESETSTATS = "resetstats";
+	public static final String HISTORICO_PARTIDA = "historico_partida_";
+	public static final String JSON = ".json";
+	public static final String EXPORTADO_PARA = "Histórico exportado para: ";
 
 	/**
 	 * This task also tests the fighting element of a round of three shots
@@ -97,12 +97,12 @@ public class Tasks {
 						if (game.getRemainingShips() == 0) {
 							game.over();
                             BoardVisualizer.fechar();                                  // fecha a janela
-							String pdfFile = "historico_partida_" + System.currentTimeMillis() + PDF_EXTENSION;
+							String pdfFile = HISTORICO_PARTIDA + System.currentTimeMillis() + ".pdf";
 							GamePdfExporter.export(game, pdfFile);
-							System.out.println("Histórico exportado para: " + pdfFile);
-							String jsonFile = "historico_partida_" + System.currentTimeMillis() + ".json";
+							System.out.println(EXPORTADO_PARA + pdfFile);
+							String jsonFile = HISTORICO_PARTIDA + System.currentTimeMillis() + JSON;
 							GameJsonExporter.export(game, jsonFile);
-							System.out.println("Histórico exportado para: " + jsonFile);
+							System.out.println(EXPORTADO_PARA + jsonFile);
 
 							GameStats stats = GameStatsRepository.load();
 							stats.update(game, true); // true = jogador ganhou
@@ -116,33 +116,31 @@ public class Tasks {
 				case SIMULA:
 
 					if (game != null) {
-						ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+                        try (ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor()) {
 
-						IFleet finalMyFleet = myFleet;
-						IGame finalGame = game;
-						Runnable simulationStep = new Runnable() {
-							@Override
-							public void run() {
-								if (finalGame.getRemainingShips() > 0) {
-									// Jogo em curso — disparar rajada aleatória
-									finalGame.randomEnemyFire();
-									finalMyFleet.printStatus();
-									finalGame.printMyBoard(true, false);
-									BoardVisualizer.atualizar(finalMyFleet, finalGame.getAlienMoves(), true);
-								} else {
-									// Jogo terminado — exportar e terminar
-									executor.shutdown();
-									finalGame.over();
-									BoardVisualizer.fechar();
-									exportAndSaveStats(finalGame);
-									System.exit(0);
-								}
-							}
-						};
+                            IFleet finalMyFleet = myFleet;
+                            IGame finalGame = game;
+                            Runnable simulationStep = () -> {
+                                if (finalGame.getRemainingShips() > 0) {
+// Jogo em curso — disparar rajada aleatória
+                                    finalGame.randomEnemyFire();
+                                    finalMyFleet.printStatus();
+                                    finalGame.printMyBoard(true, false);
+                                    BoardVisualizer.atualizar(finalMyFleet, finalGame.getAlienMoves(), true);
+                                } else {
+// Jogo terminado — exportar e terminar
+                                    executor.shutdown();
+                                    finalGame.over();
+                                    BoardVisualizer.fechar();
+                                    exportAndSaveStats(finalGame);
+                                    System.exit(0);
+                                }
+                            };
 
-						// Executa de 3 em 3 segundos sem busy-waiting
-						executor.scheduleAtFixedRate(simulationStep, 0, 3, TimeUnit.SECONDS);
-					}
+                            // Executa de 3 em 3 segundos sem busy-waiting
+                            executor.scheduleAtFixedRate(simulationStep, 0, 3, TimeUnit.SECONDS);
+                        }
+                    }
 					break;
 				case TIROS:
 					if (game != null)
@@ -153,9 +151,9 @@ public class Tasks {
                     break;
 				case EXPORTJSON:
 					if (game != null) {
-						String jsonFile = "historico_partida_" + System.currentTimeMillis() + ".json";
+						String jsonFile = Tasks.HISTORICO_PARTIDA + System.currentTimeMillis() + JSON;
 						GameJsonExporter.export(game, jsonFile);
-						System.out.println("Histórico exportado para: " + jsonFile);
+						System.out.println(EXPORTADO_PARA + jsonFile);
 					} else {
 						System.out.println("Ainda não existe jogo iniciado!");
 					}
@@ -169,9 +167,9 @@ public class Tasks {
 						if (game.getRemainingShips() == 0) {
 							game.over();
 							BoardVisualizer.fechar();
-							String pdfFile = "historico_partida_" + System.currentTimeMillis() + PDF_EXTENSION;
+							String pdfFile = Tasks.HISTORICO_PARTIDA + System.currentTimeMillis() + ".pdf";
 							GamePdfExporter.export(game, pdfFile);
-							String jsonFile = "historico_partida_" + System.currentTimeMillis() + ".json";
+							String jsonFile = Tasks.HISTORICO_PARTIDA + System.currentTimeMillis() + JSON;
 							GameJsonExporter.export(game, jsonFile);
 							GameStats stats = GameStatsRepository.load();
 							stats.update(game, true);
@@ -356,10 +354,14 @@ public class Tasks {
 		System.out.println(GOODBYE_MESSAGE);
 	}
 
+	private static @NotNull String getHistoricoPartida() {
+		return Tasks.HISTORICO_PARTIDA;
+	}
+
 	private static void exportAndSaveStats(IGame game) {
 
-			String pdfFile  = "historico_partida_" + System.currentTimeMillis() + PDF_EXTENSION;
-			String jsonFile = "historico_partida_" + System.currentTimeMillis() + ".json";
+			String pdfFile  = Tasks.HISTORICO_PARTIDA + System.currentTimeMillis() + ".pdf";
+			String jsonFile = Tasks.HISTORICO_PARTIDA + System.currentTimeMillis() + JSON;
 			GamePdfExporter.export(game, pdfFile);
 			System.out.println("Histórico PDF exportado para: " + pdfFile);
 			GameJsonExporter.export(game, jsonFile);

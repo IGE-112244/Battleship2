@@ -29,7 +29,7 @@ import java.util.ArrayList;
  * - isInsideBoard: 3
  * - colisionRisk: 2
  */
-	public class FleetTest {
+	class FleetTest {
 
 		private Fleet fleet;
 
@@ -345,9 +345,9 @@ import java.util.ArrayList;
 	@Test
 	@DisplayName("addShip() should throw AssertionError when ship is null")
 	void testAddShipNull() {
-		assertThrows(AssertionError.class, () -> fleet.addShip(null),
-				"Error: addShip() should throw AssertionError when ship is null.");
-	}
+        assertThrows(IllegalArgumentException.class, () -> fleet.addShip(null),
+                "Error: addShip() should throw IllegalArgumentException when ship is null.");
+        }
 
 	// -----------------------------------------------------------------------
 // getShipsLike() - assert category != null
@@ -356,8 +356,8 @@ import java.util.ArrayList;
 	@Test
 	@DisplayName("getShipsLike() should throw AssertionError when category is null")
 	void testGetShipsLikeNull() {
-		assertThrows(AssertionError.class, () -> fleet.getShipsLike(null),
-				"Error: getShipsLike() should throw AssertionError when category is null.");
+		assertThrows(IllegalArgumentException.class, () -> fleet.getShipsLike(null),
+				"Error: getShipsLike() should throw IllegalArgumentException when category is null.");
 	}
 
 // -----------------------------------------------------------------------
@@ -367,8 +367,8 @@ import java.util.ArrayList;
 	@Test
 	@DisplayName("shipAt() should throw AssertionError when position is null")
 	void testShipAtNull() {
-		assertThrows(AssertionError.class, () -> fleet.shipAt(null),
-				"Error: shipAt() should throw AssertionError when position is null.");
+		assertThrows(IllegalArgumentException.class, () -> fleet.shipAt(null),
+				"Error: shipAt() should throw IllegalArgumentException when position is null.");
 	}
 
 // -----------------------------------------------------------------------
@@ -378,8 +378,8 @@ import java.util.ArrayList;
 	@Test
 	@DisplayName("printShips() should throw AssertionError when list is null")
 	void testPrintShipsNull() {
-		assertThrows(AssertionError.class, () -> fleet.printShips(null),
-				"Error: printShips() should throw AssertionError when ships list is null.");
+		assertThrows(IllegalArgumentException.class, () -> fleet.printShips(null),
+				"Error: printShips() should throw IllegalArgumentException when ships list is null.");
 	}
 
 // -----------------------------------------------------------------------
@@ -389,8 +389,8 @@ import java.util.ArrayList;
 	@Test
 	@DisplayName("printShipsByCategory() should throw AssertionError when category is null")
 	void testPrintShipsByCategoryNull() {
-		assertThrows(AssertionError.class, () -> fleet.printShipsByCategory(null),
-				"Error: printShipsByCategory() should throw AssertionError when category is null.");
+		assertThrows(IllegalArgumentException.class, () -> fleet.printShipsByCategory(null),
+				"Error: printShipsByCategory() should throw IllegalArgumentException when category is null.");
 	}
 
 	// -----------------------------------------------------------------------

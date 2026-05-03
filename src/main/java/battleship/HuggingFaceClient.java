@@ -5,8 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import okhttp3.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -17,7 +21,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class HuggingFaceClient {
 
-    private static String HF_TOKEN = loadToken();
+    public static final String CONTENT = "content";
+    private static final Logger log = LogManager.getLogger(HuggingFaceClient.class);
     private static final String MODEL_URL = "https://router.huggingface.co/v1/chat/completions";
     private static final String MODEL_ID  = "meta-llama/Llama-3.1-8B-Instruct:cerebras";
     private static final MediaType JSON_TYPE = MediaType.get("application/json; charset=utf-8");
@@ -31,9 +36,6 @@ public class HuggingFaceClient {
     // System prompt com as regras e estratégia do jogo
     private static String systemPrompt = null;
 
-    // Frota da IA (posições declaradas no início)
-    private static String aiFleetJson = null;
-
     // Posições já disparadas pela IA
     private static final Set<String> aiShotHistory = new LinkedHashSet<>();
     private static final Map<String, String> aiShotResults = new LinkedHashMap<>();
@@ -45,6 +47,9 @@ public class HuggingFaceClient {
     // Configuração
     // -----------------------------------------------------------------------
 
+    private HuggingFaceClient() {
+        throw new UnsupportedOperationException("Utility class");
+    }
     /**
      * Define o prompt de sistema com as regras e estratégia do jogo.
      * Deve ser chamado antes de iniciar o jogo.
@@ -85,7 +90,6 @@ public class HuggingFaceClient {
     public static void initGame() {
         conversationHistory.clear();
         aiShotHistory.clear();
-        aiFleetJson = null;
 
         String initMessage =
                 "Antes de começar o jogo, cria agora a tua frota secreta de 11 navios " +
@@ -94,7 +98,7 @@ public class HuggingFaceClient {
                         "\"Frota criada. Pronto para jogar!\"";
 
         callAPI(initMessage);
-        System.out.println("✅ IA criou a sua frota. Jogo pronto!");
+        log.info("✅ IA criou a sua frota. Jogo pronto!");
     }
 
     // -----------------------------------------------------------------------
@@ -129,15 +133,7 @@ public class HuggingFaceClient {
 
         // Histórico completo de tiros e resultados
         if (!aiShotHistory.isEmpty()) {
-            sb.append("=== DIÁRIO DE BORDO ===\n");
-            sb.append("Posições já disparadas e resultados:\n");
-            for (String pos : aiShotHistory) {
-                String resultado = aiShotResults.getOrDefault(pos, "água");
-                sb.append("  - ").append(pos).append(": ").append(resultado).append("\n");
-            }
-            sb.append("=== FIM DO DIÁRIO ===\n\n");
-            sb.append("⚠️ NUNCA dispares nas ").append(aiShotHistory.size())
-                    .append(" posições acima!\n\n");
+            appendDiary(sb);
         }
 
         sb.append("Escolhe 3 posições NOVAS não listadas acima.\n");
@@ -145,6 +141,18 @@ public class HuggingFaceClient {
         sb.append("[{\"row\":\"A\",\"column\":1},{\"row\":\"B\",\"column\":2},{\"row\":\"C\",\"column\":3}]");
 
         return sb.toString();
+    }
+
+    private static void appendDiary(StringBuilder sb) {
+        sb.append("=== DIÁRIO DE BORDO ===\n");
+        sb.append("Posições já disparadas e resultados:\n");
+        for (String pos : aiShotHistory) {
+            String resultado = aiShotResults.getOrDefault(pos, "água");
+            sb.append("  - ").append(pos).append(": ").append(resultado).append("\n");
+        }
+        sb.append("=== FIM DO DIÁRIO ===\n\n");
+        sb.append("⚠️ NUNCA dispares nas ").append(aiShotHistory.size())
+                .append(" posições acima!\n\n");
     }
 
     /**
@@ -191,37 +199,14 @@ public class HuggingFaceClient {
     private static String callAPI(String userMessage) {
         try {
             // Construir o array de mensagens com histórico completo
-            ArrayNode messages = mapper.createArrayNode();
-
-            // 1. System prompt
-            if (systemPrompt != null) {
-                ObjectNode systemMsg = mapper.createObjectNode();
-                systemMsg.put("role",    "system");
-                systemMsg.put("content", systemPrompt);
-                messages.add(systemMsg);
-            }
-
-            // 2. Histórico completo da conversa
-            for (ObjectNode msg : conversationHistory) {
-                messages.add(msg);
-            }
-
-            // 3. Nova mensagem do utilizador
-            ObjectNode userMsg = mapper.createObjectNode();
-            userMsg.put("role",    "user");
-            userMsg.put("content", userMessage);
-            messages.add(userMsg);
+            ArrayNode messages = buildMessages(userMessage);
 
             // Construir o body do pedido
-            ObjectNode requestBody = mapper.createObjectNode();
-            requestBody.put("model",       MODEL_ID);
-            requestBody.put("max_tokens",  500);
-            requestBody.put("temperature", 0.3);
-            requestBody.set("messages",    messages);
+            ObjectNode requestBody = buildRequestBody(messages);
 
-            System.out.println("\n--- Mensagem enviada ao LLM ---");
-            System.out.println(userMessage);
-            System.out.println("-------------------------------\n");
+            log.info("\n--- Mensagem enviada ao LLM ---");
+            log.info(userMessage);
+            log.info("-------------------------------\n");
 
             // Fazer o pedido HTTP
             Request request = new Request.Builder()
@@ -235,43 +220,76 @@ public class HuggingFaceClient {
                 // Lê SEMPRE o body, mesmo em caso de erro
                 ResponseBody responseBody = response.body();
                 if (responseBody == null) {
-                    throw new RuntimeException("Resposta da API sem corpo (body null)");
+                    throw new IllegalStateException("Resposta da API sem corpo (body null)");
                 }
                 String body = responseBody.string();
 
                 if (!response.isSuccessful()) {
-                    throw new RuntimeException("Erro na API do Hugging Face: "
+                    throw new IllegalStateException("Erro na API do Hugging Face: "
                             + response.code() + " - " + response.message()
                             + "\nDetalhes: " + body);
                 }
 
-                System.out.println("--- Resposta bruta do LLM ---");
-                System.out.println(body);
-                System.out.println("-----------------------------\n");
+                log.info("--- Resposta bruta do LLM ---");
+                log.info(body);
+                log.info("-----------------------------\n");
 
                 // Extrair o conteúdo da resposta (formato OpenAI)
                 JsonNode root = mapper.readTree(body);
                 String assistantContent = root.get("choices").get(0)
-                        .get("message").get("content").asText();
+                        .get("message").get(CONTENT).asText();
 
                 // Guardar a mensagem do utilizador no histórico
                 ObjectNode userHistory = mapper.createObjectNode();
                 userHistory.put("role",    "user");
-                userHistory.put("content", userMessage);
+                userHistory.put(CONTENT, userMessage);
                 conversationHistory.add(userHistory);
 
                 // Guardar a resposta da IA no histórico
                 ObjectNode assistantHistory = mapper.createObjectNode();
                 assistantHistory.put("role",    "assistant");
-                assistantHistory.put("content", assistantContent);
+                assistantHistory.put(CONTENT, assistantContent);
                 conversationHistory.add(assistantHistory);
 
                 return assistantContent;
             }
 
         } catch (IOException e) {
-            throw new RuntimeException("Erro ao comunicar com o Hugging Face: " + e.getMessage(), e);
+            throw new UncheckedIOException("Erro ao comunicar com o Hugging Face: " + e.getMessage(), e);
         }
+    }
+
+    private static @NotNull ObjectNode buildRequestBody(ArrayNode messages) {
+        ObjectNode requestBody = mapper.createObjectNode();
+        requestBody.put("model",       MODEL_ID);
+        requestBody.put("max_tokens",  500);
+        requestBody.put("temperature", 0.3);
+        requestBody.set("messages", messages);
+        return requestBody;
+    }
+
+    private static @NotNull ArrayNode buildMessages(String userMessage) {
+        ArrayNode messages = mapper.createArrayNode();
+
+        // 1. System prompt
+        if (systemPrompt != null) {
+            ObjectNode systemMsg = mapper.createObjectNode();
+            systemMsg.put("role",    "system");
+            systemMsg.put(CONTENT, systemPrompt);
+            messages.add(systemMsg);
+        }
+
+        // 2. Histórico completo da conversa
+        for (ObjectNode msg : conversationHistory) {
+            messages.add(msg);
+        }
+
+        // 3. Nova mensagem do utilizador
+        ObjectNode userMsg = mapper.createObjectNode();
+        userMsg.put("role",    "user");
+        userMsg.put(CONTENT, userMessage);
+        messages.add(userMsg);
+        return messages;
     }
 
     // -----------------------------------------------------------------------
@@ -281,7 +299,7 @@ public class HuggingFaceClient {
     private static List<IPosition> parseShots(String content) {
         try {
             String jsonArray = extractJson(content, '[', ']');
-            System.out.println("Rajada da IA: " + jsonArray);
+            log.info("Rajada da IA: " + jsonArray);
 
             ArrayNode shotsNode = (ArrayNode) mapper.readTree(jsonArray);
             List<IPosition> shots = new ArrayList<>();
@@ -293,14 +311,14 @@ public class HuggingFaceClient {
             }
 
             if (shots.size() != Game.NUMBER_SHOTS) {
-                throw new RuntimeException("A IA devolveu " + shots.size()
+                throw new IllegalStateException("A IA devolveu " + shots.size()
                         + " tiros em vez de " + Game.NUMBER_SHOTS);
             }
 
             return shots;
 
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao interpretar rajada da IA: " + e.getMessage(), e);
+            throw new IllegalStateException("Erro ao interpretar rajada da IA: " + e.getMessage(), e);
         }
     }
 
@@ -309,38 +327,22 @@ public class HuggingFaceClient {
             // Encontrar início do JSON
             int start = content.indexOf('{');
             if (start == -1) {
-                throw new RuntimeException("Sem JSON na resposta: " + content);
+                throw new IllegalStateException("Sem JSON na resposta: " + content);
             }
 
             // Reconstruir JSON válido contando chavetas
-            int depth = 0;
-            int end = -1;
-            for (int i = start; i < content.length(); i++) {
-                if (content.charAt(i) == '{') depth++;
-                if (content.charAt(i) == '}') depth--;
-                if (depth == 0) { end = i + 1; break; }
-            }
+            int end = findJsonEnd(content, start);
 
             String jsonObject;
             if (end == -1) {
                 // JSON truncado — tentar completar
-                System.out.println("⚠️ JSON truncado, a tentar completar...");
-                String truncated = content.substring(start);
-                // Fechar arrays abertos
-                long openBrackets = 0;
-                long closeBrackets = 0;
-                for (char c : truncated.toCharArray()) {
-                    if (c == '[') openBrackets++;
-                    if (c == ']') closeBrackets++;
-                }StringBuilder fixed = new StringBuilder(truncated);
-                for (long i = 0; i < openBrackets - closeBrackets; i++) fixed.append("]");
-                fixed.append("}");
-                jsonObject = fixed.toString();
+                log.info("⚠️ JSON truncado, a tentar completar...");
+                jsonObject = fixTruncatedJson(content, start);
             } else {
                 jsonObject = content.substring(start, end);
             }
 
-            System.out.println("Resultado da frota da IA: " + jsonObject);
+            log.info("Resultado da frota da IA: " + jsonObject);
 
             // Validar JSON
             mapper.readTree(jsonObject);
@@ -348,10 +350,38 @@ public class HuggingFaceClient {
 
         } catch (Exception e) {
             // Fallback — assumir tiros na água
-            System.out.println("⚠️ Erro ao interpretar resposta, assumindo tiros na água.");
+            log.info("⚠️ Erro ao interpretar resposta, assumindo tiros na água.");
             return "{\"validShots\":3,\"sunkBoats\":[],\"repeatedShots\":0," +
                     "\"outsideShots\":0,\"hitsOnBoats\":[],\"missedShots\":3}";
         }
+    }
+
+    private static @NotNull String fixTruncatedJson(String content, int start) {
+        String jsonObject;
+        String truncated = content.substring(start);
+        // Fechar arrays abertos
+        long openBrackets = 0;
+        long closeBrackets = 0;
+        for (char c : truncated.toCharArray()) {
+            if (c == '[') openBrackets++;
+            if (c == ']') closeBrackets++;
+        }
+        StringBuilder fixed = new StringBuilder(truncated);
+        for (long i = 0; i < openBrackets - closeBrackets; i++) fixed.append("]");
+        fixed.append("}");
+        jsonObject = fixed.toString();
+        return jsonObject;
+    }
+
+    private static int findJsonEnd(String content, int start) {
+        int depth = 0;
+        int end = -1;
+        for (int i = start; i < content.length(); i++) {
+            if (content.charAt(i) == '{') depth++;
+            if (content.charAt(i) == '}') depth--;
+            if (depth == 0) { end = i + 1; break; }
+        }
+        return end;
     }
 
     private static String extractJson(String text, char open, char close) {
@@ -359,7 +389,7 @@ public class HuggingFaceClient {
         int end   = text.lastIndexOf(close) + 1;
 
         if (start == -1 || end == 0) {
-            throw new RuntimeException("Não foi encontrado JSON válido na resposta da IA:\n" + text);
+            throw new IllegalStateException("Não foi encontrado JSON válido na resposta da IA:\n" + text);
         }
 
         return text.substring(start, end);

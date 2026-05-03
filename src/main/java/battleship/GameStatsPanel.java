@@ -1,5 +1,6 @@
 package battleship;
 
+import org.jetbrains.annotations.NotNull;
 import org.knowm.xchart.*;
 import org.knowm.xchart.style.Styler;
 
@@ -15,6 +16,9 @@ public class GameStatsPanel {
 
     private static JFrame frame;
 
+    private GameStatsPanel() {
+        throw new UnsupportedOperationException("Utility class");
+    }
     private static final String FONT_NAME = "SansSerif";
 
     /**
@@ -37,22 +41,61 @@ public class GameStatsPanel {
         // -----------------------------------------------------------------------
         // Painel de métricas (topo)
         // -----------------------------------------------------------------------
-        JPanel metricsPanel = new JPanel(new GridLayout(1, 3, 10, 0));
-        metricsPanel.setBackground(new Color(15, 40, 80));
-        metricsPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 5, 15));
-
-        metricsPanel.add(createMetricCard("🎮 Jogos Realizados",
-                String.valueOf(stats.getTotalJogos())));
-        metricsPanel.add(createMetricCard("🏆 Jogos Ganhos",
-                String.valueOf(stats.getJogosGanhos())));
-        metricsPanel.add(createMetricCard("🎯 Precisão",
-                String.format("%.1f%%", stats.getAccuracy())));
+        JPanel metricsPanel = buildMetricsPanel(stats);
 
         frame.add(metricsPanel, BorderLayout.NORTH);
 
         // -----------------------------------------------------------------------
         // Gráfico de barras (centro) — usando XChart
         // -----------------------------------------------------------------------
+        JPanel chartPanel = buildChartPanel(stats);
+        frame.add(chartPanel, BorderLayout.CENTER);
+
+        // -----------------------------------------------------------------------
+        // Botão Reset Stats (fundo)
+        // -----------------------------------------------------------------------
+        JPanel bottomPanel = buildBottomPanel();
+        frame.add(bottomPanel, BorderLayout.SOUTH);
+
+        // -----------------------------------------------------------------------
+        // Mostrar janela
+        // -----------------------------------------------------------------------
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+    }
+
+    private static @NotNull JPanel buildBottomPanel() {
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        bottomPanel.setBackground(new Color(15, 40, 80));
+        bottomPanel.setBorder(BorderFactory.createEmptyBorder(5, 15, 15, 15));
+
+        JButton resetButton = new JButton("🗑️ Reset Stats");
+        resetButton.setBackground(new Color(180, 40, 40));
+        resetButton.setForeground(Color.WHITE);
+        resetButton.setFocusPainted(false);
+        resetButton.setFont(new Font(FONT_NAME, Font.BOLD, 13));
+        resetButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        resetButton.addActionListener(e -> {
+            int confirm = JOptionPane.showConfirmDialog(
+                    frame,
+                    "Tens a certeza que queres apagar todas as estatísticas?",
+                    "Confirmar Reset",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.WARNING_MESSAGE
+            );
+            if (confirm == JOptionPane.YES_OPTION) {
+                GameStatsRepository.reset();
+                frame.dispose();
+                mostrar(); // Reabrir com stats a zero
+            }
+        });
+
+        bottomPanel.add(resetButton);
+        return bottomPanel;
+    }
+
+    private static @NotNull JPanel buildChartPanel(GameStats stats) {
         CategoryChart chart = new CategoryChartBuilder()
                 .width(500)
                 .height(300)
@@ -82,45 +125,21 @@ public class GameStatsPanel {
 
         JPanel chartPanel = new XChartPanel<>(chart);
         chartPanel.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
-        frame.add(chartPanel, BorderLayout.CENTER);
+        return chartPanel;
+    }
 
-        // -----------------------------------------------------------------------
-        // Botão Reset Stats (fundo)
-        // -----------------------------------------------------------------------
-        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        bottomPanel.setBackground(new Color(15, 40, 80));
-        bottomPanel.setBorder(BorderFactory.createEmptyBorder(5, 15, 15, 15));
+    private static @NotNull JPanel buildMetricsPanel(GameStats stats) {
+        JPanel metricsPanel = new JPanel(new GridLayout(1, 3, 10, 0));
+        metricsPanel.setBackground(new Color(15, 40, 80));
+        metricsPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 5, 15));
 
-        JButton resetButton = new JButton("🗑️ Reset Stats");
-        resetButton.setBackground(new Color(180, 40, 40));
-        resetButton.setForeground(Color.WHITE);
-        resetButton.setFocusPainted(false);
-        resetButton.setFont(new Font(FONT_NAME, Font.BOLD, 13));
-        resetButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        resetButton.addActionListener(e -> {
-            int confirm = JOptionPane.showConfirmDialog(
-                    frame,
-                    "Tens a certeza que queres apagar todas as estatísticas?",
-                    "Confirmar Reset",
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.WARNING_MESSAGE
-            );
-            if (confirm == JOptionPane.YES_OPTION) {
-                GameStatsRepository.reset();
-                frame.dispose();
-                mostrar(); // Reabrir com stats a zero
-            }
-        });
-
-        bottomPanel.add(resetButton);
-        frame.add(bottomPanel, BorderLayout.SOUTH);
-
-        // -----------------------------------------------------------------------
-        // Mostrar janela
-        // -----------------------------------------------------------------------
-        frame.pack();
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
+        metricsPanel.add(createMetricCard("🎮 Jogos Realizados",
+                String.valueOf(stats.getTotalJogos())));
+        metricsPanel.add(createMetricCard("🏆 Jogos Ganhos",
+                String.valueOf(stats.getJogosGanhos())));
+        metricsPanel.add(createMetricCard("🎯 Precisão",
+                String.format("%.1f%%", stats.getAccuracy())));
+        return metricsPanel;
     }
 
     /**
