@@ -72,12 +72,16 @@ public class Game implements IGame
 			System.out.print("--");
 		System.out.println("-+");
 
+		printLegend(showLegend);
+		System.out.println();
+	}
+
+	private static void printLegend(boolean showLegend) {
 		if (showLegend) {
 			System.out.println("          LEGENDA");
 			System.out.println("'" + SHIP_MARKER + "'->navio, '" + SHIP_ADJACENT_MARKER + "'->adjacente a navio, '" + EMPTY_MARKER + "'->água");
 			System.out.println("'" + SHOT_SHIP_MARKER + "'->Tiro certeiro, '" + SHOT_WATER_MARKER + "'->Tiro na água");
 		}
-		System.out.println();
 	}
 
 	private static void fillMap(IFleet fleet, char[][] map) {
