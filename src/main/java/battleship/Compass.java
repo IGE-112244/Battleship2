@@ -1,5 +1,7 @@
 package battleship;
 
+import java.util.Random;
+
 /**
  * The enum Compass.
  *
@@ -29,9 +31,11 @@ public enum Compass
 	 *
 	 * @return A random compass direction.
 	 */
+	private static final Random RANDOM = new Random();
+
 	public static Compass randomBearing() {
 		Compass[] values = Compass.values();  // Get all enum values
-		int randomIndex = (int) (Math.random() * values.length);  // Pick a random index
+		int randomIndex = RANDOM.nextInt(values.length);  // Pick a random index
 		return values[randomIndex];  // Return the random compass direction
 	}
 

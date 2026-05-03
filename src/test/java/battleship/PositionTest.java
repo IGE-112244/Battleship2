@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * - hashCode(): 1
  * - toString(): 1
  */
-public class PositionTest {
+ class PositionTest {
 	private Position position;
 
 	@BeforeEach
@@ -283,8 +283,7 @@ public class PositionTest {
 	@Test
 	@DisplayName("equals6(): mesma coluna, diferente row deve ser false")
 	void equals6() {
-		assertFalse(position.equals(new Position(1, 3)),
-				"Error: positions with different row should not be equal");
+        assertNotEquals(position, new Position(1, 3), "Error: positions with different row should not be equal");
 	}
 
 }
