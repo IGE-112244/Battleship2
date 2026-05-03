@@ -186,9 +186,12 @@ public class Fleet implements IFleet
 			throw new IllegalArgumentException("Position cannot be null");
 		}
 
-		for (IShip ship : ships)
-			if (ship.occupies(pos))
-				return ship;
+		for (IShip ship : ships) {
+            if (!ship.occupies(pos)) {
+                continue;
+            }
+            return ship;
+        }
 		return null;
     }
 

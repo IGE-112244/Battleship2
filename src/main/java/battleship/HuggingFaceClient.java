@@ -23,7 +23,6 @@ public class HuggingFaceClient {
 
     public static final String CONTENT = "content";
     private static final Logger log = LogManager.getLogger(HuggingFaceClient.class);
-    private static String HF_TOKEN = loadToken();
     private static final String MODEL_URL = "https://router.huggingface.co/v1/chat/completions";
     private static final String MODEL_ID  = "meta-llama/Llama-3.1-8B-Instruct:cerebras";
     private static final MediaType JSON_TYPE = MediaType.get("application/json; charset=utf-8");
@@ -407,11 +406,8 @@ public class HuggingFaceClient {
         try {
             java.util.Properties props = new java.util.Properties();
             props.load(new java.io.FileReader("config.properties"));
-            String token = props.getProperty("HF_TOKEN");
-            System.out.println("Token lido: " + (token != null ? token.substring(0, 5) + "..." : "null"));
-            return token;
+            return props.getProperty("HF_TOKEN");
         } catch (Exception e) {
-            System.out.println("Erro ao ler config: " + e.getMessage());
             return null;
         }
     }
