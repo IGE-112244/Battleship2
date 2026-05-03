@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * - randomBearing(): 1
  * - charToCompass(): 5
  */
-public class CompassTest {
+class CompassTest {
 
 	private Compass compass;
 

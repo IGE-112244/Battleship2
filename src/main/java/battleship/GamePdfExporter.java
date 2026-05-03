@@ -2,6 +2,8 @@ package battleship;
 
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.awt.Color;
 import java.io.FileOutputStream;
@@ -15,6 +17,8 @@ import java.util.List;
      * Utiliza a biblioteca OpenPDF (com.github.librepdf:openpdf).
      */
     public class GamePdfExporter {
+
+        private static final Logger LOGGER = LogManager.getLogger();
 
         // Cores do tema naval
         private static final Color COLOR_NAVY     = new Color(10, 36, 99);
@@ -30,10 +34,12 @@ import java.util.List;
         private static final Font FONT_SUBTITLE   = new Font(Font.HELVETICA, 11, Font.ITALIC, COLOR_OCEAN);
         private static final Font FONT_SECTION    = new Font(Font.HELVETICA, 13, Font.BOLD,   COLOR_NAVY);
         private static final Font FONT_TABLE_HDR  = new Font(Font.HELVETICA, 10, Font.BOLD,   COLOR_WHITE);
-        private static final Font FONT_TABLE_BODY = new Font(Font.HELVETICA,  9, Font.NORMAL, Color.DARK_GRAY);
         private static final Font FONT_SUMMARY    = new Font(Font.HELVETICA, 10, Font.NORMAL, Color.DARK_GRAY);
         private static final Font FONT_SUMMARY_V  = new Font(Font.HELVETICA, 10, Font.BOLD,   COLOR_NAVY);
 
+        private GamePdfExporter() {
+            // Utility class — prevent instantiation
+        }
         /**
          * Gera o PDF do histórico de jogadas e guarda-o no caminho indicado.
          *
@@ -56,7 +62,7 @@ import java.util.List;
                 addMovesTable(document, game.getMyMoves(), "As Minhas Jogadas (tiros no tabuleiro inimigo)");
 
                 document.close();
-                System.out.println("PDF exportado com sucesso: " + filePath);
+                LOGGER.info("PDF exportado com sucesso: {}", filePath);
 
             } catch (DocumentException | IOException e) {
                 throw new RuntimeException("Erro ao gerar o PDF: " + e.getMessage(), e);
@@ -168,7 +174,7 @@ import java.util.List;
                 for (int i = 0; i < Game.NUMBER_SHOTS; i++) {
                     if (i < shots.size()) {
                         IPosition pos = shots.get(i);
-                        String shotStr = pos.isInside() ? pos.toString() : pos.toString() + " (!)";
+                        String shotStr = pos.toString() + (pos.isInside() ? "" : " (!)");
                         Color textColor = getShotColor(results, i);
                         addBodyCellColored(table, shotStr, bg, textColor, Element.ALIGN_CENTER);
                     } else {
@@ -233,7 +239,11 @@ import java.util.List;
         private static String buildResultText(List<IGame.ShotResult> results) {
             if (results == null || results.isEmpty()) return "—";
 
-            int hits = 0, misses = 0, repeated = 0, invalid = 0, sunk = 0;
+            int hits = 0;
+            int misses = 0;
+            int repeated = 0;
+            int invalid = 0;
+            int sunk = 0;
             StringBuilder sunkNames = new StringBuilder();
 
             for (IGame.ShotResult r : results) {

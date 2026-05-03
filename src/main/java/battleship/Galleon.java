@@ -55,11 +55,19 @@ public class Galleon extends Ship {
 	 * @param pos The initial position of the ship.
 	 */
 	private void fillSouth(IPosition pos) {
-		for (int i = 0; i < 2; i++) {
-			getPositions().add(new Position(pos.getRow() + i, pos.getColumn()));
-		}
+		fillSouthTop(pos);
+		fillSouthBottom(pos);
+	}
+
+	private void fillSouthBottom(IPosition pos) {
 		for (int j = 2; j < 5; j++) {
 			getPositions().add(new Position(pos.getRow() + 2, pos.getColumn() + j - 3));
+		}
+	}
+
+	private void fillSouthTop(IPosition pos) {
+		for (int i = 0; i < 2; i++) {
+			getPositions().add(new Position(pos.getRow() + i, pos.getColumn()));
 		}
 	}
 
