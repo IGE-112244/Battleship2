@@ -36,7 +36,6 @@ public class PositionTest {
 	@BeforeEach
 	void setUp() {
 		position = new Position(2, 3);
-	//	position = new Position('C', 4);
 	}
 
 	@AfterEach
@@ -186,7 +185,6 @@ public class PositionTest {
 
 	@Test
 	void toStringFormat() {
-//		String expected = "Row = C, Column = 4";
 		String expected = "C4";
 		assertEquals(expected, position.toString(),
 				"Incorrect string representation: expected '" + expected +
