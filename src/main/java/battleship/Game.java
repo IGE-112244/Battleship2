@@ -26,8 +26,8 @@ public class Game implements IGame
 	 */
 	public static void printBoard(IFleet fleet, List<IMove> moves, boolean showShots, boolean showLegend) {
 
-		assert fleet != null;
-		assert moves != null;
+		if (fleet == null) throw new IllegalArgumentException("fleet must not be null");
+		if (moves == null) throw new IllegalArgumentException("moves must not be null");
 
 		char[][] map = new char[BOARD_SIZE][BOARD_SIZE];
 
@@ -113,7 +113,7 @@ public class Game implements IGame
 	 */
 	public static String jsonShots(List<IPosition> shots) {
 
-		assert shots != null;
+		if (shots == null) throw new IllegalArgumentException("shots must not be null");
 
 		// Serializar os tiros gerados em JSON usando a biblioteca Jackson
 		ObjectMapper objectMapper = new ObjectMapper();
@@ -286,7 +286,7 @@ public class Game implements IGame
 	 */
 	public String readEnemyFire(Scanner in) {
 
-		assert in != null;
+		if (in == null) throw new IllegalArgumentException("in must not be null");
 
 		String input = in.nextLine().trim();
 
@@ -336,7 +336,7 @@ public class Game implements IGame
 	 */
 	public void fireShots(List<IPosition> shots)
 	{
-		assert shots != null;
+		if (shots == null) throw new IllegalArgumentException("shots must not be null");
 
 		List<ShotResult> shotResults = new ArrayList<ShotResult>();
 		if (shots.size() != NUMBER_SHOTS) {
@@ -372,7 +372,7 @@ public class Game implements IGame
 	 */
 	public ShotResult fireSingleShot(IPosition pos, boolean isRepeated) {
 
-		assert pos != null;
+		if (pos == null) throw new IllegalArgumentException("pos must not be null");
 
 		if (!pos.isInside()) {
 			countInvalidShots++;
@@ -435,7 +435,7 @@ public class Game implements IGame
 
 	public boolean repeatedShot(IPosition pos)
 	{
-		assert pos != null;
+		if (pos == null) throw new IllegalArgumentException("pos must not be null");
 
 		for (IMove move : alienMoves)
 			if (move.getShots().contains(pos))
