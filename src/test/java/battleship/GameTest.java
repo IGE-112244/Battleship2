@@ -227,6 +227,12 @@ class GameTest {
 		assertDoesNotThrow(() -> game.readEnemyFire(scanner),
 				"Error: readEnemyFire should handle separate column and row tokens.");
 	}
+	@Test
+	@DisplayName("readEnemyFire() should throw when Scanner is null")
+	void readEnemyFire5() {
+		assertThrows(IllegalArgumentException.class, () -> game.readEnemyFire(null),
+				"Error: Should throw IllegalArgumentException when Scanner is null.");
+	}
 
 	@Test
 	@DisplayName("printBoard() should not throw with a fleet containing ships")
@@ -334,5 +340,29 @@ class GameTest {
 		assertDoesNotThrow(() -> Game.printBoard(fleet, List.of(move), true, false),
 				"Error: printBoard should handle SHIP_ADJACENT_MARKER positions.");
 	}
+
+
+	@Test
+	@DisplayName("readEnemyFireFromJson() should throw RuntimeException for malformed JSON")
+	void readEnemyFireFromJson3() {
+		Scanner scanner = new Scanner("isto não é json\n\n");
+		assertThrows(RuntimeException.class, () -> game.readEnemyFireFromJson(scanner),
+				"Should throw RuntimeException for malformed JSON.");
+	}
+
+	@Test
+	@DisplayName("printBoard() should ignore shots outside the board")
+	void printBoard7() {
+		Fleet fleet = new Fleet();
+		Move move = new Move(1,
+				List.of(new Position(-1, -1)),
+				List.of(new IGame.ShotResult(false, false, null, false))
+		);
+
+		assertDoesNotThrow(() -> Game.printBoard(fleet, List.of(move), true, false),
+				"printBoard should ignore shots outside the board.");
+	}
+
+
 
 }
