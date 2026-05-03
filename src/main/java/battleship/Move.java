@@ -137,11 +137,7 @@ public class Move implements IMove {
 		}
 
 		// Criar o mapa para o JSON
-		Map<String, Object> response = new HashMap<>();
-		response.put("validShots", result.validShots());
-		response.put("outsideShots", outsideShots);
-		response.put("repeatedShots", result.repeatedShots());
-		response.put("missedShots", result.missedShots());
+		Map<String, Object> response = buildResponseMap(result, outsideShots);
 
 		// Criar a lista de barcos afundados
 		List<Map<String, Object>> sunkBoats = new ArrayList<>();
@@ -183,6 +179,15 @@ public class Move implements IMove {
 
 		// Retornar o JSON
 		return jsonString;
+	}
+
+	private static @NotNull Map<String, Object> buildResponseMap(processShotResults result, int outsideShots) {
+		Map<String, Object> response = new HashMap<>();
+		response.put("validShots", result.validShots());
+		response.put("outsideShots", outsideShots);
+		response.put("repeatedShots", result.repeatedShots());
+		response.put("missedShots", result.missedShots());
+		return response;
 	}
 
 	private @NotNull processShotResults getProcessShotResults(int repeatedShots, int validShots, int missedShots, Map<String, Integer> hitsPerBoat, Map<String, Integer> sunkBoatsCount) {
