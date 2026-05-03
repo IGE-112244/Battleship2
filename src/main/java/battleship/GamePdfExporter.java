@@ -174,7 +174,7 @@ import java.util.List;
                 for (int i = 0; i < Game.NUMBER_SHOTS; i++) {
                     if (i < shots.size()) {
                         IPosition pos = shots.get(i);
-                        String shotStr = pos.isInside() ? pos.toString() : pos.toString() + " (!)";
+                        String shotStr = pos.toString() + (pos.isInside() ? "" : " (!)");
                         Color textColor = getShotColor(results, i);
                         addBodyCellColored(table, shotStr, bg, textColor, Element.ALIGN_CENTER);
                     } else {
