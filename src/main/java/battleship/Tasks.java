@@ -18,10 +18,13 @@ import org.jetbrains.annotations.NotNull;
  * The type Tasks.
  */
 public class Tasks {
+	private Tasks() {}
 	/**
 	 * The constant LOGGER.
 	 */
 	private static final Logger LOGGER = LogManager.getLogger();
+
+	private static final String PDF_EXTENSION = ".pdf";
 
 	/**
 	 * The constant GOODBYE_MESSAGE.
@@ -94,7 +97,7 @@ public class Tasks {
 						if (game.getRemainingShips() == 0) {
 							game.over();
                             BoardVisualizer.fechar();                                  // fecha a janela
-							String pdfFile = "historico_partida_" + System.currentTimeMillis() + ".pdf";
+							String pdfFile = "historico_partida_" + System.currentTimeMillis() + PDF_EXTENSION;
 							GamePdfExporter.export(game, pdfFile);
 							System.out.println("Histórico exportado para: " + pdfFile);
 							String jsonFile = "historico_partida_" + System.currentTimeMillis() + ".json";
@@ -166,7 +169,7 @@ public class Tasks {
 						if (game.getRemainingShips() == 0) {
 							game.over();
 							BoardVisualizer.fechar();
-							String pdfFile = "historico_partida_" + System.currentTimeMillis() + ".pdf";
+							String pdfFile = "historico_partida_" + System.currentTimeMillis() + PDF_EXTENSION;
 							GamePdfExporter.export(game, pdfFile);
 							String jsonFile = "historico_partida_" + System.currentTimeMillis() + ".json";
 							GameJsonExporter.export(game, jsonFile);
@@ -355,7 +358,7 @@ public class Tasks {
 
 	private static void exportAndSaveStats(IGame game) {
 
-			String pdfFile  = "historico_partida_" + System.currentTimeMillis() + ".pdf";
+			String pdfFile  = "historico_partida_" + System.currentTimeMillis() + PDF_EXTENSION;
 			String jsonFile = "historico_partida_" + System.currentTimeMillis() + ".json";
 			GamePdfExporter.export(game, pdfFile);
 			System.out.println("Histórico PDF exportado para: " + pdfFile);
