@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * - getShotColor(): 5
  * - buildResultText(): 10
  */
-public class GamePdfExporterTest {
+ class GamePdfExporterTest {
 
     private Game game;
     private String testFilePath;
