@@ -76,7 +76,9 @@ class GameStatsTest {
         public String readEnemyFire(Scanner in) { return "mock"; }
 
         @Override
-        public void fireShots(List<IPosition> shots) {}
+        public void fireShots(List<IPosition> shots) {
+            // Mock implementation — no action needed for testing purposes
+        }
 
         @Override
         public ShotResult fireSingleShot(IPosition pos, boolean isRepeated) {
@@ -113,13 +115,19 @@ class GameStatsTest {
         public int getRemainingShips() { return 0; }
 
         @Override
-        public void printMyBoard(boolean showShots, boolean show_legend) {}
+        public void printMyBoard(boolean showShots, boolean show_legend) {
+            // Mock implementation — no action needed for testing purposes
+        }
 
         @Override
-        public void printAlienBoard(boolean showShots, boolean show_legend) {}
+        public void printAlienBoard(boolean showShots, boolean show_legend) {
+            // Mock implementation — no action needed for testing purposes
+        }
 
         @Override
-        public void over() {}
+        public void over() {
+            // Mock implementation — no action needed for testing purposes
+        }
     }
 
     @BeforeEach
