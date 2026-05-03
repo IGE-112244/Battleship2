@@ -22,6 +22,10 @@ import okhttp3.OkHttpClient;
 import org.junit.jupiter.api.*;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -157,15 +161,18 @@ class HuggingFaceClientTest {
     // parseResult() via reflection
     // -----------------------------------------------------------------------
 
-    @Test
-    @DisplayName("parseResult() should return valid JSON when input contains valid JSON object")
-    void parseResult1() throws Exception {
+    private static Method getParseResultMethod() throws Exception {
         Method method = HuggingFaceClient.class
                 .getDeclaredMethod("parseResult", String.class);
         method.setAccessible(true);
+        return method;
+    }
 
+    @Test
+    @DisplayName("parseResult() should return valid JSON when input contains valid JSON object")
+    void parseResult1() throws Exception {
         String validJson = "{\"validShots\":3,\"sunkBoats\":[],\"missedShots\":3}";
-        String result = (String) method.invoke(null, validJson);
+        String result = (String) getParseResultMethod().invoke(null, validJson);
         assertEquals(validJson, result,
                 "Error: parseResult() should return the valid JSON object.");
     }
@@ -173,11 +180,7 @@ class HuggingFaceClientTest {
     @Test
     @DisplayName("parseResult() should return fallback JSON when input has no JSON")
     void parseResult2() throws Exception {
-        Method method = HuggingFaceClient.class
-                .getDeclaredMethod("parseResult", String.class);
-        method.setAccessible(true);
-
-        String result = (String) method.invoke(null, "sem json aqui");
+        String result = (String) getParseResultMethod().invoke(null, "sem json aqui");
         assertTrue(result.contains("validShots"),
                 "Error: parseResult() should return fallback JSON when no JSON found.");
     }
@@ -185,13 +188,8 @@ class HuggingFaceClientTest {
     @Test
     @DisplayName("parseResult() should handle truncated JSON")
     void parseResult3() throws Exception {
-        Method method = HuggingFaceClient.class
-                .getDeclaredMethod("parseResult", String.class);
-        method.setAccessible(true);
-
-        // JSON truncado sem fechar
-        String truncated = "{\"validShots\":3,\"sunkBoats\":[{\"count\":1";
-        String result = (String) method.invoke(null, truncated);
+        String result = (String) getParseResultMethod().invoke(null,
+                "{\"validShots\":3,\"sunkBoats\":[{\"count\":1");
         assertNotNull(result,
                 "Error: parseResult() should return a non-null result for truncated JSON.");
     }
@@ -199,14 +197,18 @@ class HuggingFaceClientTest {
     @Test
     @DisplayName("parseResult() should return fallback JSON on exception")
     void parseResult4() throws Exception {
-        Method method = HuggingFaceClient.class
-                .getDeclaredMethod("parseResult", String.class);
-        method.setAccessible(true);
-
-        // Input que causa exceção no parsing
-        String result = (String) method.invoke(null, "{{invalid{{json");
+        String result = (String) getParseResultMethod().invoke(null, "{{invalid{{json");
         assertTrue(result.contains("validShots"),
                 "Error: parseResult() should return fallback JSON on parsing exception.");
+    }
+
+    @Test
+    @DisplayName("parseResult() should handle truncated JSON with unclosed arrays")
+    void parseResult5() throws Exception {
+        String result = (String) getParseResultMethod().invoke(null,
+                "{\"validShots\":3,\"sunkBoats\":[{\"count\":1,\"type\":\"Barca\"");
+        assertNotNull(result,
+                "Error: parseResult() should return non-null for truncated JSON with open arrays.");
     }
 
     // -----------------------------------------------------------------------
@@ -545,19 +547,7 @@ class HuggingFaceClientTest {
                 "Error: extractJson() should throw when closing bracket is missing.");
     }
 
-    @Test
-    @DisplayName("parseResult() should handle truncated JSON with unclosed arrays")
-    void parseResult5() throws Exception {
-        Method method = HuggingFaceClient.class
-                .getDeclaredMethod("parseResult", String.class);
-        method.setAccessible(true);
 
-        // JSON truncado com array aberto mas não fechado
-        String truncated = "{\"validShots\":3,\"sunkBoats\":[{\"count\":1,\"type\":\"Barca\"";
-        String result = (String) method.invoke(null, truncated);
-        assertNotNull(result,
-                "Error: parseResult() should return non-null for truncated JSON with open arrays.");
-    }
 
     // -----------------------------------------------------------------------
 // Testes com chamadas reais à API (requerem HF_TOKEN válido)

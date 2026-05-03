@@ -371,6 +371,20 @@ class TasksTest {
     }
 
     // -----------------------------------------------------------------------
+// readClassicPosition() - formato 'A 3' separado
+// -----------------------------------------------------------------------
+
+    @Test
+    @DisplayName("readClassicPosition() should parse 'A 3' with letter then integer")
+    void readClassicPosition6() {
+        // Este formato entra no segundo branch: part1=[A-Z] e part2=\d+
+        Scanner in = new Scanner(new ByteArrayInputStream("A 3\n".getBytes()));
+        IPosition pos = Tasks.readClassicPosition(in);
+        assertNotNull(pos,
+                "Error: readClassicPosition() should parse 'A 3' format correctly.");
+    }
+
+    // -----------------------------------------------------------------------
 // exportAndSaveStats() via reflection
 // -----------------------------------------------------------------------
 
@@ -487,19 +501,7 @@ class TasksTest {
                 "Error: readPosition() should throw AssertionError when scanner is null.");
     }
 
-// -----------------------------------------------------------------------
-// readClassicPosition() - formato 'A 3' separado
-// -----------------------------------------------------------------------
 
-    @Test
-    @DisplayName("readClassicPosition() should parse 'A 3' with letter then integer")
-    void readClassicPosition6() {
-        // Este formato entra no segundo branch: part1=[A-Z] e part2=\d+
-        Scanner in = new Scanner(new ByteArrayInputStream("A 3\n".getBytes()));
-        IPosition pos = Tasks.readClassicPosition(in);
-        assertNotNull(pos,
-                "Error: readClassicPosition() should parse 'A 3' format correctly.");
-    }
 
 // -----------------------------------------------------------------------
 // readPlayerShots() via reflection
