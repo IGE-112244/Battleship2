@@ -664,7 +664,7 @@ class HuggingFaceClientTest {
             assertEquals(Game.NUMBER_SHOTS, shots.size(),
                     "Error: getNextShots() should return NUMBER_SHOTS positions.");
         } catch (RuntimeException e) {
-            assertTrue(e.getMessage() != null,
+            assertNotNull(e.getMessage(),
                     "Error: getNextShots() should throw RuntimeException with message.");
         }
     }
