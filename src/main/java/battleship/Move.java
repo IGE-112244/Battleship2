@@ -171,7 +171,7 @@ public class Move implements IMove {
 		try {
 			jsonString = objectMapper.writeValueAsString(response);
 		} catch (JsonProcessingException e) {
-			throw new RuntimeException("Erro ao serializar o JSON dos resultados da jogada", e);
+			throw new IllegalStateException("Erro ao serializar o JSON dos resultados da jogada", e);
 		}
 
 		System.out.println(jsonString);

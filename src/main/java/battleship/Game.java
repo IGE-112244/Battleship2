@@ -134,7 +134,7 @@ public class Game implements IGame
 			// 2. Serialize the simplified list instead of the raw 'shots' list
 			jsonString = objectMapper.writeValueAsString(simplifiedShots);
 		} catch (JsonProcessingException e) {
-			throw new RuntimeException("Erro ao serializar o JSON", e);
+			throw new IllegalStateException("Erro ao serializar o JSON", e);
 		}
 
 		// Retornar o JSON
@@ -476,7 +476,7 @@ System.out.println("Cola aqui o JSON do Gemini (termina com linha vazia):");
 		try {
 			parseJsonShots(mapper, sb, shots);
 		} catch (Exception e) {
-			throw new RuntimeException("Erro ao ler JSON do Gemini: " + e.getMessage(), e);
+			throw new IllegalStateException("Erro ao ler JSON do Gemini: " + e.getMessage(), e);
 		}
 
 		if (shots.size() != NUMBER_SHOTS) {
