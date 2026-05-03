@@ -113,10 +113,10 @@ class GameStatsTest {
         public int getRemainingShips() { return 0; }
 
         @Override
-        public void printMyBoard(boolean show_shots, boolean show_legend) {}
+        public void printMyBoard(boolean showShots, boolean show_legend) {}
 
         @Override
-        public void printAlienBoard(boolean show_shots, boolean show_legend) {}
+        public void printAlienBoard(boolean showShots, boolean show_legend) {}
 
         @Override
         public void over() {}
