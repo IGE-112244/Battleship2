@@ -181,4 +181,45 @@ import static org.junit.jupiter.api.Assertions.*;
         assertDoesNotThrow(() -> GamePdfExporter.export(game, testFilePath),
                 "Error: export() should not throw when multiple ships are sunk.");
     }
+
+    @Test
+    @DisplayName("getShotColor() should handle null results")
+    void getShotColor5() {
+        IMove move = new Move(1, List.of(new Position(1,1)), null);
+        game.getAlienMoves().add(move);
+        assertDoesNotThrow(() -> GamePdfExporter.export(game, testFilePath));
+    }
+
+    @Test
+    @DisplayName("buildResultText() should handle null results")
+    void buildResultText5() {
+        IMove move = new Move(1, List.of(new Position(1,1)), null);
+        game.getAlienMoves().add(move);
+        assertDoesNotThrow(() -> GamePdfExporter.export(game, testFilePath));
+    }
+
+    @Test
+    @DisplayName("buildResultText() should handle invalid shots")
+    void buildResultText6() {
+        // Tiro inválido: fora do tabuleiro
+        game.fireShots(List.of(
+                new Position(-1, -1),   // inválido
+                new Position(2, 2),
+                new Position(3, 3)
+        ));
+
+        assertDoesNotThrow(() -> GamePdfExporter.export(game, testFilePath),
+                "Error: export() should not throw for invalid shots.");
+    }
+
+    @Test
+    @DisplayName("buildResultText() should return 'Sem resultado' when no results exist")
+    void buildResultText7() {
+        IMove move = new Move(1, List.of(), List.of());
+        game.getAlienMoves().add(move);
+
+        assertDoesNotThrow(() -> GamePdfExporter.export(game, testFilePath),
+                "Error: export() should not throw for empty results list.");
+    }
+
 }
