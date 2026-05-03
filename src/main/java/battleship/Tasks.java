@@ -18,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
  * The type Tasks.
  */
 public class Tasks {
+	private Tasks() {}
 	/**
 	 * The constant LOGGER.
 	 */
