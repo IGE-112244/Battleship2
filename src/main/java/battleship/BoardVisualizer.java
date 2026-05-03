@@ -17,6 +17,7 @@ import java.util.List;
  * - Direita:  o tabuleiro da IA (com os teus ataques e resultados conhecidos)
  */
 public class BoardVisualizer {
+    private BoardVisualizer() {}
 
     private static Screen screen = null;
 
