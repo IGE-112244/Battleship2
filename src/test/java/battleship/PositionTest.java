@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * - hashCode(): 1
  * - toString(): 1
  */
-public class PositionTest {
+ class PositionTest {
 	private Position position;
 
 	@BeforeEach
