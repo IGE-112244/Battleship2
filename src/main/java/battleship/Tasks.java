@@ -113,30 +113,31 @@ public class Tasks {
 				case SIMULA:
 
 					if (game != null) {
-						ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+                        try (ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor()) {
 
-						IFleet finalMyFleet = myFleet;
-						IGame finalGame = game;
-						Runnable simulationStep = () -> {
-							if (finalGame.getRemainingShips() > 0) {
-								// Jogo em curso — disparar rajada aleatória
-								finalGame.randomEnemyFire();
-								finalMyFleet.printStatus();
-								finalGame.printMyBoard(true, false);
-								BoardVisualizer.atualizar(finalMyFleet, finalGame.getAlienMoves(), true);
-							} else {
-								// Jogo terminado — exportar e terminar
-								executor.shutdown();
-								finalGame.over();
-								BoardVisualizer.fechar();
-								exportAndSaveStats(finalGame);
-								System.exit(0);
-							}
-						};
+                            IFleet finalMyFleet = myFleet;
+                            IGame finalGame = game;
+                            Runnable simulationStep = () -> {
+                                if (finalGame.getRemainingShips() > 0) {
+// Jogo em curso — disparar rajada aleatória
+                                    finalGame.randomEnemyFire();
+                                    finalMyFleet.printStatus();
+                                    finalGame.printMyBoard(true, false);
+                                    BoardVisualizer.atualizar(finalMyFleet, finalGame.getAlienMoves(), true);
+                                } else {
+// Jogo terminado — exportar e terminar
+                                    executor.shutdown();
+                                    finalGame.over();
+                                    BoardVisualizer.fechar();
+                                    exportAndSaveStats(finalGame);
+                                    System.exit(0);
+                                }
+                            };
 
-						// Executa de 3 em 3 segundos sem busy-waiting
-						executor.scheduleAtFixedRate(simulationStep, 0, 3, TimeUnit.SECONDS);
-					}
+                            // Executa de 3 em 3 segundos sem busy-waiting
+                            executor.scheduleAtFixedRate(simulationStep, 0, 3, TimeUnit.SECONDS);
+                        }
+                    }
 					break;
 				case TIROS:
 					if (game != null)
