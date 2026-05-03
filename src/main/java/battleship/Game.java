@@ -5,11 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.jetbrains.annotations.NotNull;
+import java.util.logging.Logger;
 
 import java.util.*;
 
 public class Game implements IGame
 {
+	private static final Logger LOGGER = Logger.getLogger(Game.class.getName());
 	/**
 	 * Prints the game board by representing the positions of ships, adjacent tiles,
 	 * shots, and other game elements onto the console. The method also optionally
@@ -46,42 +48,42 @@ public class Game implements IGame
 					}
 				}
 
-		System.out.println();
-		System.out.print("    ");
+		LOGGER.info("");
+		LOGGER.info("    ");
 		for (int col = 0; col < BOARD_SIZE; col++) {
-			System.out.print(" " + (col + 1));
+			LOGGER.info(" " + (col + 1));
 		}
-		System.out.println();
+		LOGGER.info("");
 
-		System.out.print("   +-");
+		LOGGER.info("   +-");
 		for (int col = 0; col < BOARD_SIZE; col++) {
-			System.out.print("--");
+			LOGGER.info("--");
 		}
-		System.out.println("+");
+		LOGGER.info("+");
 
 		for (int row = 0; row < BOARD_SIZE; row++) {
 			Position pos = new Position(row, 0);
 			char rowLabel = pos.getClassicRow();
-			System.out.print(" " + rowLabel + " |");
+			LOGGER.info(" " + rowLabel + " |");
 			for (int col = 0; col < BOARD_SIZE; col++)
-				System.out.print(" " + map[row][col]);
-			System.out.println(" |");
+				LOGGER.info(" " + map[row][col]);
+			LOGGER.info(" |");
 		}
 
-		System.out.print("   +");
+		LOGGER.info("   +");
 		for (int col = 0; col < BOARD_SIZE; col++)
-			System.out.print("--");
-		System.out.println("-+");
+			LOGGER.info("--");
+		LOGGER.info("-+");
 
 		printLegend(showLegend);
-		System.out.println();
+		LOGGER.info("");
 	}
 
 	private static void printLegend(boolean showLegend) {
 		if (showLegend) {
-			System.out.println("          LEGENDA");
-			System.out.println("'" + SHIP_MARKER + "'->navio, '" + SHIP_ADJACENT_MARKER + "'->adjacente a navio, '" + EMPTY_MARKER + "'->água");
-			System.out.println("'" + SHOT_SHIP_MARKER + "'->Tiro certeiro, '" + SHOT_WATER_MARKER + "'->Tiro na água");
+			LOGGER.info("          LEGENDA");
+			LOGGER.info("'" + SHIP_MARKER + "'->navio, '" + SHIP_ADJACENT_MARKER + "'->adjacente a navio, '" + EMPTY_MARKER + "'->água");
+			LOGGER.info("'" + SHOT_SHIP_MARKER + "'->Tiro certeiro, '" + SHOT_WATER_MARKER + "'->Tiro na água");
 		}
 	}
 
@@ -224,7 +226,7 @@ public class Game implements IGame
 		// Criar lista para armazenar os tiros
 		List<IPosition> shots = new ArrayList<>();
 
-		System.out.println();
+		LOGGER.info("");
 		// Gerar coordenadas únicas até atingir o número definido por NUMBER_SHOTS
 
 		IPosition newShot = null;
@@ -244,10 +246,10 @@ public class Game implements IGame
 				shots.add(newShot);
 		}
 
-		System.out.print("rajada ");
+		LOGGER.info("rajada ");
 		for (IPosition shot : shots)
-			System.out.print(shot + " ");
-		System.out.println();
+			LOGGER.info(shot + " ");
+		LOGGER.info("");
 
 		this.fireShots(shots);
 
@@ -464,7 +466,7 @@ public class Game implements IGame
 	 * @return o JSON de resposta para enviar ao LLM
 	 */
 	public String readEnemyFireFromJson(Scanner in) {
-System.out.println("Cola aqui o JSON do Gemini (termina com linha vazia):");
+		LOGGER.info("Cola aqui o JSON do Gemini (termina com linha vazia):");
 		StringBuilder sb = new StringBuilder();
 		String line;
 		while (!(line = in.nextLine()).isEmpty()) {
