@@ -475,12 +475,7 @@ System.out.println("Cola aqui o JSON do Gemini (termina com linha vazia):");
 		List<IPosition> shots = new ArrayList<>();
 
 		try {
-			JsonNode root = mapper.readTree(sb.toString());
-			for (JsonNode node : root) {
-				String row = node.get("row").asText();       // ex: "B"
-				int column = node.get("column").asInt();     // ex: 3
-				shots.add(new Position(row.toUpperCase().charAt(0), column));
-			}
+			parseJsonShots(mapper, sb, shots);
 		} catch (Exception e) {
 			throw new RuntimeException("Erro ao ler JSON do Gemini: " + e.getMessage(), e);
 		}
@@ -497,5 +492,14 @@ System.out.println("Cola aqui o JSON do Gemini (termina com linha vazia):");
 		System.out.println("------------------------------\n");
 
 		return jsonResponse;
+	}
+
+	private static void parseJsonShots(ObjectMapper mapper, StringBuilder sb, List<IPosition> shots) throws JsonProcessingException {
+		JsonNode root = mapper.readTree(sb.toString());
+		for (JsonNode node : root) {
+			String row = node.get("row").asText();       // ex: "B"
+			int column = node.get("column").asInt();     // ex: 3
+			shots.add(new Position(row.toUpperCase().charAt(0), column));
+		}
 	}
 }
