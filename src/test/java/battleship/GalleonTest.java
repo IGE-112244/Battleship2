@@ -19,7 +19,7 @@ import java.util.List;
  * - getLeftMostPos: 2
  * - getRightMostPos: 2
  */
-public class GalleonTest {
+class GalleonTest {
 
 	private Galleon galleon;
 

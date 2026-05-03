@@ -22,7 +22,7 @@ import java.util.List;
  * - getLeftMostPos: 2
  * - getRightMostPos: 2
  */
-public class CarrackTest {
+class CarrackTest {
 
     private Carrack carrack;
 

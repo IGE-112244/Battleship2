@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * - printValidShots: 1
  * - printFleet: 1
  */
-public class GameTest {
+class GameTest {
 
 	private Game game;
 
