@@ -137,9 +137,6 @@ public class Game implements IGame
 			throw new RuntimeException("Erro ao serializar o JSON", e);
 		}
 
-//		System.out.println(jsonString);
-//		System.out.println();
-
 		// Retornar o JSON
 		return jsonString;
 	}
@@ -350,8 +347,6 @@ public class Game implements IGame
 		}
 
 		Move move = new Move(moveNumber, shots, shotResults);
-
-//		System.out.println(move);
 
 		move.processEnemyFire(true);
 
