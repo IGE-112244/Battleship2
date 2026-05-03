@@ -16,6 +16,9 @@ import java.util.*;
  */
 public class GameJsonExporter {
 
+    private GameJsonExporter() {
+        // Utility class — prevent instantiation
+    }
     /**
      * Exporta o histórico completo do jogo para um ficheiro JSON no caminho indicado.
      *

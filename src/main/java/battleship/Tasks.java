@@ -297,13 +297,9 @@ public class Tasks {
 								for (IGame.ShotResult r : myResults) {
 									if (!r.valid()) {
 										resultMsg.append("❌ Tiro fora do tabuleiro!\n");
-										continue;
-									}
-									if (r.repeated()) {
+									} else if (r.repeated()) {
 										resultMsg.append("🔄 Tiro repetido!\n");
-										continue;
-									}
-									if (r.ship() != null) {
+									} else if (r.ship() != null) {
 										if (r.sunk()) {
 											aiShipsRemaining[0]--;
 											resultMsg.append("🔥 Afundaste: ")

@@ -34,6 +34,9 @@ import java.util.List;
         private static final Font FONT_SUMMARY    = new Font(Font.HELVETICA, 10, Font.NORMAL, Color.DARK_GRAY);
         private static final Font FONT_SUMMARY_V  = new Font(Font.HELVETICA, 10, Font.BOLD,   COLOR_NAVY);
 
+        private GamePdfExporter() {
+            // Utility class — prevent instantiation
+        }
         /**
          * Gera o PDF do histórico de jogadas e guarda-o no caminho indicado.
          *

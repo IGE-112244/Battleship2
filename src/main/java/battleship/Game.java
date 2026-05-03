@@ -4,11 +4,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.jetbrains.annotations.NotNull;
+import java.util.logging.Logger;
 
 import java.util.*;
 
 public class Game implements IGame
 {
+	private static final Logger LOGGER = Logger.getLogger(Game.class.getName());
 	/**
 	 * Prints the game board by representing the positions of ships, adjacent tiles,
 	 * shots, and other game elements onto the console. The method also optionally
@@ -18,31 +21,21 @@ public class Game implements IGame
 	 *                    and their positions are shown according to their placement.
 	 * @param moves       the list of moves containing shots. If shot positions are shown,
 	 *                    they will be rendered based on their outcome (hit, miss, etc.).
-	 * @param show_shots  if true, displays the shots taken during the game and marks
+	 * @param showShots  if true, displays the shots taken during the game and marks
 	 *                    their result (hit or miss) on the board.
 	 * @param showLegend  if true, displays an explanatory legend of the symbols used
 	 *                    to represent various elements such as ships, misses, hits, etc.
 	 */
-	public static void printBoard(IFleet fleet, List<IMove> moves, boolean show_shots, boolean showLegend) {
+	public static void printBoard(IFleet fleet, List<IMove> moves, boolean showShots, boolean showLegend) {
 
-		assert fleet != null;
-		assert moves != null;
+		if (fleet == null) throw new IllegalArgumentException("fleet must not be null");
+		if (moves == null) throw new IllegalArgumentException("moves must not be null");
 
 		char[][] map = new char[BOARD_SIZE][BOARD_SIZE];
 
-		for (int r = 0; r < BOARD_SIZE; r++)
-			for (int c = 0; c < BOARD_SIZE; c++)
-				map[r][c] = EMPTY_MARKER;
+		fillMap(fleet, map);
 
-		for (IShip ship : fleet.getShips()) {
-			for (IPosition ship_pos : ship.getPositions())
-				map[ship_pos.getRow()][ship_pos.getColumn()] = SHIP_MARKER;
-			if (!ship.stillFloating())
-				for (IPosition adjacent_pos : ship.getAdjacentPositions())
-					map[adjacent_pos.getRow()][adjacent_pos.getColumn()] = SHIP_ADJACENT_MARKER;
-		}
-
-		if (show_shots)
+		if (showShots)
 			for (IMove move : moves)
 				for (IPosition shot : move.getShots()) {
 					if (shot.isInside()){
@@ -55,39 +48,57 @@ public class Game implements IGame
 					}
 				}
 
-		System.out.println();
-		System.out.print("    ");
+		LOGGER.info("");
+		LOGGER.info("    ");
 		for (int col = 0; col < BOARD_SIZE; col++) {
-			System.out.print(" " + (col + 1));
+			LOGGER.info(" " + (col + 1));
 		}
-		System.out.println();
+		LOGGER.info("");
 
-		System.out.print("   +-");
+		LOGGER.info("   +-");
 		for (int col = 0; col < BOARD_SIZE; col++) {
-			System.out.print("--");
+			LOGGER.info("--");
 		}
-		System.out.println("+");
+		LOGGER.info("+");
 
 		for (int row = 0; row < BOARD_SIZE; row++) {
 			Position pos = new Position(row, 0);
 			char rowLabel = pos.getClassicRow();
-			System.out.print(" " + rowLabel + " |");
+			LOGGER.info(" " + rowLabel + " |");
 			for (int col = 0; col < BOARD_SIZE; col++)
-				System.out.print(" " + map[row][col]);
-			System.out.println(" |");
+				LOGGER.info(" " + map[row][col]);
+			LOGGER.info(" |");
 		}
 
-		System.out.print("   +");
+		LOGGER.info("   +");
 		for (int col = 0; col < BOARD_SIZE; col++)
-			System.out.print("--");
-		System.out.println("-+");
+			LOGGER.info("--");
+		LOGGER.info("-+");
 
+		printLegend(showLegend);
+		LOGGER.info("");
+	}
+
+	private static void printLegend(boolean showLegend) {
 		if (showLegend) {
-			System.out.println("          LEGENDA");
-			System.out.println("'" + SHIP_MARKER + "'->navio, '" + SHIP_ADJACENT_MARKER + "'->adjacente a navio, '" + EMPTY_MARKER + "'->água");
-			System.out.println("'" + SHOT_SHIP_MARKER + "'->Tiro certeiro, '" + SHOT_WATER_MARKER + "'->Tiro na água");
+			LOGGER.info("          LEGENDA");
+			LOGGER.info("'" + SHIP_MARKER + "'->navio, '" + SHIP_ADJACENT_MARKER + "'->adjacente a navio, '" + EMPTY_MARKER + "'->água");
+			LOGGER.info("'" + SHOT_SHIP_MARKER + "'->Tiro certeiro, '" + SHOT_WATER_MARKER + "'->Tiro na água");
 		}
-		System.out.println();
+	}
+
+	private static void fillMap(IFleet fleet, char[][] map) {
+		for (int r = 0; r < BOARD_SIZE; r++)
+			for (int c = 0; c < BOARD_SIZE; c++)
+				map[r][c] = EMPTY_MARKER;
+
+		for (IShip ship : fleet.getShips()) {
+			for (IPosition ship_pos : ship.getPositions())
+				map[ship_pos.getRow()][ship_pos.getColumn()] = SHIP_MARKER;
+			if (!ship.stillFloating())
+				for (IPosition adjacent_pos : ship.getAdjacentPositions())
+					map[adjacent_pos.getRow()][adjacent_pos.getColumn()] = SHIP_ADJACENT_MARKER;
+		}
 	}
 
 	/**
@@ -104,7 +115,7 @@ public class Game implements IGame
 	 */
 	public static String jsonShots(List<IPosition> shots) {
 
-		assert shots != null;
+		if (shots == null) throw new IllegalArgumentException("shots must not be null");
 
 		// Serializar os tiros gerados em JSON usando a biblioteca Jackson
 		ObjectMapper objectMapper = new ObjectMapper();
@@ -120,16 +131,13 @@ public class Game implements IGame
 			simplifiedShots.add(simplePos);
 		}
 
-		String jsonString = null;
+		String jsonString;
 		try {
 			// 2. Serialize the simplified list instead of the raw 'shots' list
 			jsonString = objectMapper.writeValueAsString(simplifiedShots);
 		} catch (JsonProcessingException e) {
-			throw new RuntimeException("Erro ao serializar o JSON", e);
+			throw new IllegalStateException("Erro ao serializar o JSON", e);
 		}
-
-//		System.out.println(jsonString);
-//		System.out.println();
 
 		// Retornar o JSON
 		return jsonString;
@@ -163,8 +171,8 @@ public class Game implements IGame
 	{
 		this.moveNumber = 1;
 
-		this.alienMoves = new ArrayList<IMove>();
-		this.myMoves = new ArrayList<IMove>();
+		this.alienMoves = new ArrayList<>();
+		this.myMoves = new ArrayList<>();
 
 		this.alienFleet = new Fleet();
 		this.myFleet = myFleet;
@@ -213,20 +221,12 @@ public class Game implements IGame
 		// Criar uma instância de Random com uma seed baseada no timestamp atual
 		Random random = new Random(System.currentTimeMillis());
 
-		Set<IPosition> usablePositions = new HashSet<IPosition>();
-		for (int r = 0; r < BOARD_SIZE; r++)
-			for (int c = 0; c < BOARD_SIZE; c++)
-				usablePositions.add(new Position(r, c));
-
-		this.myFleet.getSunkShips().forEach(ship -> usablePositions.removeAll(ship.getAdjacentPositions()));
-		this.alienMoves.forEach(move ->  usablePositions.removeAll(move.getShots()));
-
-		List<IPosition> candidateShots = new ArrayList<>(usablePositions);
+		List<IPosition> candidateShots = buildCandidateShots();
 
 		// Criar lista para armazenar os tiros
-		List<IPosition> shots = new ArrayList<IPosition>();
+		List<IPosition> shots = new ArrayList<>();
 
-		System.out.println();
+		LOGGER.info("");
 		// Gerar coordenadas únicas até atingir o número definido por NUMBER_SHOTS
 
 		IPosition newShot = null;
@@ -246,14 +246,28 @@ public class Game implements IGame
 				shots.add(newShot);
 		}
 
-		System.out.print("rajada ");
+		LOGGER.info("rajada ");
 		for (IPosition shot : shots)
-			System.out.print(shot + " ");
-		System.out.println();
+			LOGGER.info(shot + " ");
+		LOGGER.info("");
 
 		this.fireShots(shots);
 
 		return Game.jsonShots(shots);
+	}
+
+	private @NotNull List<IPosition> buildCandidateShots() {
+		Set<IPosition> usablePositions = new HashSet<IPosition>();
+		for (int r = 0; r < BOARD_SIZE; r++)
+			for (int c = 0; c < BOARD_SIZE; c++)
+				usablePositions.add(new Position(r, c));
+
+		this.myFleet.getSunkShips().forEach(ship ->
+				usablePositions.removeAll(new HashSet<>(ship.getAdjacentPositions())));
+		this.alienMoves.forEach(move ->
+				usablePositions.removeAll(new HashSet<>(move.getShots())));
+
+		return new ArrayList<>(usablePositions);
 	}
 
 
@@ -272,7 +286,7 @@ public class Game implements IGame
 	 */
 	public String readEnemyFire(Scanner in) {
 
-		assert in != null;
+		if (in == null) throw new IllegalArgumentException("in must not be null");
 
 		String input = in.nextLine().trim();
 
@@ -322,22 +336,20 @@ public class Game implements IGame
 	 */
 	public void fireShots(List<IPosition> shots)
 	{
-		assert shots != null;
+		if (shots == null) throw new IllegalArgumentException("shots must not be null");
 
-		List<ShotResult> shotResults = new ArrayList<ShotResult>();
+		List<ShotResult> shotResults = new ArrayList<>();
 		if (shots.size() != NUMBER_SHOTS) {
 			throw new IllegalArgumentException("Must fire exactly " + NUMBER_SHOTS + " shots per move.");
 		}
 
-		List<IPosition> alreadyShot = new ArrayList<IPosition>();
+		List<IPosition> alreadyShot = new ArrayList<>();
 		for (IPosition pos : shots) {
 			shotResults.add(fireSingleShot(pos, alreadyShot.contains(pos)));
 			alreadyShot.add(pos);
 		}
 
 		Move move = new Move(moveNumber, shots, shotResults);
-
-//		System.out.println(move);
 
 		move.processEnemyFire(true);
 
@@ -358,7 +370,7 @@ public class Game implements IGame
 	 */
 	public ShotResult fireSingleShot(IPosition pos, boolean isRepeated) {
 
-		assert pos != null;
+		if (pos == null) throw new IllegalArgumentException("pos must not be null");
 
 		if (!pos.isInside()) {
 			countInvalidShots++;
@@ -370,6 +382,10 @@ public class Game implements IGame
 			return new ShotResult(true, true, null, false);
 		}
 
+		return processHit(pos);
+	}
+
+	private @NotNull ShotResult processHit(IPosition pos) {
 		IShip ship = myFleet.shipAt(pos);
 		if (ship == null)
 			return new ShotResult(true, false, null, false);
@@ -417,7 +433,7 @@ public class Game implements IGame
 
 	public boolean repeatedShot(IPosition pos)
 	{
-		assert pos != null;
+		if (pos == null) throw new IllegalArgumentException("pos must not be null");
 
 		for (IMove move : alienMoves)
 			if (move.getShots().contains(pos))
@@ -425,14 +441,14 @@ public class Game implements IGame
 		return false;
 	}
 
-	public void printMyBoard(boolean show_shots, boolean show_legend)
+	public void printMyBoard(boolean showShots, boolean showLegend)
 	{
-		Game.printBoard(this.myFleet, this.alienMoves, show_shots, show_legend);
+		Game.printBoard(this.myFleet, this.alienMoves, showShots, showLegend);
 	}
 
-	public void printAlienBoard(boolean show_shots, boolean show_legend)
+	public void printAlienBoard(boolean showShots, boolean show_legend)
 	{
-		Game.printBoard(this.alienFleet, this.myMoves, show_shots, show_legend);
+		Game.printBoard(this.alienFleet, this.myMoves, showShots, show_legend);
 	}
 
 	public void over() {
@@ -450,7 +466,7 @@ public class Game implements IGame
 	 * @return o JSON de resposta para enviar ao LLM
 	 */
 	public String readEnemyFireFromJson(Scanner in) {
-System.out.println("Cola aqui o JSON do Gemini (termina com linha vazia):");
+		LOGGER.info("Cola aqui o JSON do Gemini (termina com linha vazia):");
 		StringBuilder sb = new StringBuilder();
 		String line;
 		while (!(line = in.nextLine()).isEmpty()) {
@@ -461,14 +477,9 @@ System.out.println("Cola aqui o JSON do Gemini (termina com linha vazia):");
 		List<IPosition> shots = new ArrayList<>();
 
 		try {
-			JsonNode root = mapper.readTree(sb.toString());
-			for (JsonNode node : root) {
-				String row = node.get("row").asText();       // ex: "B"
-				int column = node.get("column").asInt();     // ex: 3
-				shots.add(new Position(row.toUpperCase().charAt(0), column));
-			}
+			parseJsonShots(mapper, sb, shots);
 		} catch (Exception e) {
-			throw new RuntimeException("Erro ao ler JSON do Gemini: " + e.getMessage(), e);
+			throw new IllegalStateException("Erro ao ler JSON do Gemini: " + e.getMessage(), e);
 		}
 
 		if (shots.size() != NUMBER_SHOTS) {
@@ -483,5 +494,14 @@ System.out.println("Cola aqui o JSON do Gemini (termina com linha vazia):");
 		System.out.println("------------------------------\n");
 
 		return jsonResponse;
+	}
+
+	private static void parseJsonShots(ObjectMapper mapper, StringBuilder sb, List<IPosition> shots) throws JsonProcessingException {
+		JsonNode root = mapper.readTree(sb.toString());
+		for (JsonNode node : root) {
+			String row = node.get("row").asText();       // ex: "B"
+			int column = node.get("column").asInt();     // ex: 3
+			shots.add(new Position(row.toUpperCase().charAt(0), column));
+		}
 	}
 }
