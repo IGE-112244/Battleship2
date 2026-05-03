@@ -1,11 +1,10 @@
 package battleship;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * Modelo de dados que representa as estatísticas acumuladas do jogador.
  * É serializado/desserializado em JSON pelo GameStatsRepository.
  */
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 public class GameStats {
 
     private int totalJogos;

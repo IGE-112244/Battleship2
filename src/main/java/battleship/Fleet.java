@@ -94,7 +94,9 @@ public class Fleet implements IFleet
     @Override
     public boolean addShip(IShip s)
     {
-		assert s != null;
+		if (s == null) {
+			throw new IllegalArgumentException("Ship cannot be null");
+		}
 
 		boolean result = false;
 		if ((ships.size() <= FLEET_SIZE) && (isInsideBoard(s)) && (!colisionRisk(s)))
@@ -119,7 +121,9 @@ public class Fleet implements IFleet
     @Override
     public List<IShip> getShipsLike(String category)
     {
-		assert category != null;
+		if (category == null) {
+			throw new IllegalArgumentException("Category cannot be null");
+		}
 
 		List<IShip> shipsLike = new ArrayList<>();
 		for (IShip s : ships)
@@ -185,11 +189,16 @@ public class Fleet implements IFleet
     @Override
     public IShip shipAt(IPosition pos)
     {
-		assert pos != null;
+		if (pos == null) {
+			throw new IllegalArgumentException("Position cannot be null");
+		}
 
-		for (IShip ship : ships)
-			if (ship.occupies(pos))
-				return ship;
+		for (IShip ship : ships) {
+            if (!ship.occupies(pos)) {
+                continue;
+            }
+            return ship;
+        }
 		return null;
     }
 
@@ -201,7 +210,9 @@ public class Fleet implements IFleet
 	 */
 	private boolean isInsideBoard(IShip s)
     {
-		assert s != null;
+		if (s == null) {
+			throw new IllegalArgumentException("Ship cannot be null");
+		}
 
 		return (s.getLeftMostPos() >= 0 && s.getRightMostPos() <= Game.BOARD_SIZE - 1 && s.getTopMostPos() >= 0
 			&& s.getBottomMostPos() <= Game.BOARD_SIZE - 1);
@@ -215,7 +226,9 @@ public class Fleet implements IFleet
 	 */
 	private boolean colisionRisk(IShip s)
     {
-		assert s != null;
+		if (s == null) {
+			throw new IllegalArgumentException("Ship cannot be null");
+		}
 
 		for (int i = 0; i < ships.size(); i++)
 		{
@@ -232,7 +245,9 @@ public class Fleet implements IFleet
 	 */
 	public void printShips(List<IShip> ships)
 	{
-		assert ships != null;
+		if (ships == null) {
+			throw new IllegalArgumentException("Ships list cannot be null");
+		}
 
 		for (IShip ship : ships)
 			System.out.println(ship);
@@ -255,7 +270,9 @@ public class Fleet implements IFleet
 	 */
 	public void printShipsByCategory(String category)
     {
-		assert category != null;
+		if (category == null) {
+			throw new IllegalArgumentException("Category cannot be null");
+		}
 
 		printShips(getShipsLike(category));
     }
