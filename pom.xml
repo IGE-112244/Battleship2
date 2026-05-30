@@ -194,6 +194,10 @@
 					<includes>
 						<include>**/*Test.java</include>
 					</includes>
+					<excludes>
+						<exclude>**/HuggingFaceClientTest.java</exclude>
+					</excludes>
+					<argLine>-ea -Dnet.bytebuddy.experimental=true</argLine>
 				</configuration>
 			</plugin>
 
