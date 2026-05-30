@@ -12,6 +12,6 @@
       ]
     }
   },
-  "postCreateCommand": "mvn clean compile -DskipTests",
+  "postCreateCommand": "mvn clean compile",
   "remoteUser": "root"
 }
