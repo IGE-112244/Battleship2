@@ -21,7 +21,7 @@ import java.util.List;
 public class BoardVisualizer {
     private BoardVisualizer() {}
 
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger(BoardVisualizer.class);
 
     private static Screen screen = null;
 
