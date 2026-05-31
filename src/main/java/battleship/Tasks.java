@@ -114,33 +114,35 @@ public class Tasks {
 					}
 					break;
 				case SIMULA:
-
 					if (game != null) {
-                        try (ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor()) {
+						ScheduledExecutorService executor =
+								Executors.newSingleThreadScheduledExecutor();
 
-                            IFleet finalMyFleet = myFleet;
-                            IGame finalGame = game;
-                            Runnable simulationStep = () -> {
-                                if (finalGame.getRemainingShips() > 0) {
-// Jogo em curso — disparar rajada aleatória
-                                    finalGame.randomEnemyFire();
-                                    finalMyFleet.printStatus();
-                                    finalGame.printMyBoard(true, false);
-                                    BoardVisualizer.atualizar(finalMyFleet, finalGame.getAlienMoves(), true);
-                                } else {
-// Jogo terminado — exportar e terminar
-                                    executor.shutdown();
-                                    finalGame.over();
-                                    BoardVisualizer.fechar();
-                                    exportAndSaveStats(finalGame);
-                                    System.exit(0);
-                                }
-                            };
+						IFleet finalMyFleet = myFleet;
+						IGame finalGame = game;
 
-                            // Executa de 3 em 3 segundos sem busy-waiting
-                            executor.scheduleAtFixedRate(simulationStep, 0, 3, TimeUnit.SECONDS);
-                        }
-                    }
+						Runnable simulationStep = () -> {
+							if (finalGame.getRemainingShips() > 0) {
+								finalGame.randomEnemyFire();
+								finalMyFleet.printStatus();
+								finalGame.printMyBoard(true, false);
+								BoardVisualizer.atualizar(
+										finalMyFleet,
+										finalGame.getAlienMoves(),
+										List.of(),
+										true);
+							} else {
+								executor.shutdown();
+								finalGame.over();
+								BoardVisualizer.fechar();
+								exportAndSaveStats(finalGame);
+								System.exit(0);
+							}
+						};
+
+						executor.scheduleAtFixedRate(
+								simulationStep, 0, 3, TimeUnit.SECONDS);
+					}
 					break;
 				case TIROS:
 					if (game != null)
