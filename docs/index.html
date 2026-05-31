@@ -54,6 +54,7 @@
         .badge-green { background: #276749; color: #9ae6b4; }
         .badge-blue { background: #2a4365; color: #90cdf4; }
         .badge-gray { background: #2d3748; color: #cbd5e0; }
+        .badge-orange { background: #744210; color: #fbd38d; }
 
         nav {
             background: #1a1f2e;
@@ -101,7 +102,6 @@
             margin-bottom: 0.75rem;
         }
 
-        /* Team cards */
         .team-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -133,7 +133,6 @@
         .team-card .name { font-weight: 600; font-size: 0.95rem; }
         .team-card .number { font-size: 0.8rem; color: #718096; margin-top: 4px; }
 
-        /* Feature table */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -161,7 +160,6 @@
         .status-wip { color: #f6ad55; }
         .status-no { color: #fc8181; }
 
-        /* Tech stack */
         .tech-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -176,24 +174,12 @@
             text-align: center;
         }
 
-        .tech-card .tech-icon {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
+        .tech-card .tech-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+        .tech-card .tech-name { font-weight: 600; font-size: 0.9rem; color: #e2e8f0; }
+        .tech-card .tech-val { font-size: 0.8rem; color: #718096; margin-top: 4px; }
+        .tech-card .tech-val a { color: #90cdf4; text-decoration: none; }
+        .tech-card .tech-val a:hover { text-decoration: underline; }
 
-        .tech-card .tech-name {
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: #e2e8f0;
-        }
-
-        .tech-card .tech-val {
-            font-size: 0.8rem;
-            color: #718096;
-            margin-top: 4px;
-        }
-
-        /* Install steps */
         .steps {
             counter-reset: step;
             list-style: none;
@@ -243,7 +229,6 @@
         code { padding: 2px 6px; }
         pre { padding: 1rem; overflow-x: auto; margin-top: 0.5rem; }
 
-        /* Roadmap */
         .roadmap-list {
             list-style: none;
             display: flex;
@@ -263,7 +248,6 @@
         .check-done { color: #68d391; font-size: 1.1rem; }
         .check-todo { color: #4a5568; font-size: 1.1rem; }
 
-        /* Video */
         .video-banner {
             background: #1a1f2e;
             border: 1px solid #2d3748;
@@ -280,6 +264,54 @@
         }
 
         .video-banner a:hover { text-decoration: underline; }
+
+        /* Warning box */
+        .warning-box {
+            background: #2d1f00;
+            border: 1px solid #744210;
+            border-left: 4px solid #f6ad55;
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #fbd38d;
+        }
+
+        .warning-box strong { color: #f6ad55; }
+
+        /* Deploy cards */
+        .deploy-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .deploy-card {
+            background: #1a1f2e;
+            border: 1px solid #2d3748;
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .deploy-card .deploy-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+        .deploy-card .deploy-title { font-weight: 700; font-size: 1rem; color: #e2e8f0; margin-bottom: 0.25rem; }
+        .deploy-card .deploy-url { font-size: 0.85rem; margin-top: 0.5rem; }
+        .deploy-card .deploy-url a { color: #90cdf4; text-decoration: none; word-break: break-all; }
+        .deploy-card .deploy-url a:hover { text-decoration: underline; }
+        .deploy-card .deploy-desc { font-size: 0.82rem; color: #718096; margin-top: 0.5rem; }
+
+        .status-pill {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 9999px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        .pill-green { background: #276749; color: #9ae6b4; }
+        .pill-orange { background: #744210; color: #fbd38d; }
 
         footer {
             background: #1a1f2e;
@@ -307,6 +339,7 @@
         <span class="badge badge-green">build: passing</span>
         <span class="badge badge-blue">Java 21+</span>
         <span class="badge badge-gray">license: MIT</span>
+        <span class="badge badge-orange">Docker: available</span>
     </div>
 </header>
 
@@ -316,6 +349,7 @@
     <a href="#features">Funcionalidades</a>
     <a href="#stack">Tecnologias</a>
     <a href="#install">Instalação</a>
+    <a href="#deploy">Deploy</a>
     <a href="#roadmap">Roadmap</a>
 </nav>
 
@@ -455,7 +489,7 @@ java -jar target/BattleshipGamePlayer-2.0.jar</pre>
             </li>
             <li>
                 <div class="step-content">
-                    <div class="step-title">Ou via Docker</div>
+                    <div class="step-title">Ou via Docker (recomendado)</div>
                     <pre>docker run -it carol123456/battleship-game:latest</pre>
                 </div>
             </li>
@@ -477,6 +511,56 @@ java -jar target/BattleshipGamePlayer-2.0.jar</pre>
         </table>
     </section>
 
+    <section id="deploy">
+        <h2>🌐 Distribuição e Deploy</h2>
+
+        <div class="deploy-grid">
+            <div class="deploy-card">
+                <div class="deploy-icon">🐳</div>
+                <div class="deploy-title">Docker Hub</div>
+                <span class="status-pill pill-green">✅ Disponível</span>
+                <div class="deploy-url">
+                    <a href="https://hub.docker.com/r/carol123456/battleship-game" target="_blank">
+                        hub.docker.com/r/carol123456/battleship-game
+                    </a>
+                </div>
+                <div class="deploy-desc">Imagem pública atualizada automaticamente a cada push via GitHub Actions.</div>
+                <pre style="margin-top:0.75rem;">docker run -it carol123456/battleship-game:latest</pre>
+            </div>
+
+            <div class="deploy-card">
+                <div class="deploy-icon">☁️</div>
+                <div class="deploy-title">Render (Cloud)</div>
+                <span class="status-pill pill-orange">⚠️ Limitado — ver nota</span>
+                <div class="deploy-url">
+                    <a href="https://battleship-game-latest.onrender.com" target="_blank">
+                        battleship-game-latest.onrender.com
+                    </a>
+                </div>
+                <div class="deploy-desc">Contentor em execução na nuvem. A imagem é descarregada automaticamente do Docker Hub.</div>
+            </div>
+        </div>
+
+        <div class="warning-box">
+            <strong>⚠️ Porquê o link do Render não permite jogar diretamente no browser?</strong>
+            <br><br>
+            O Battleship 2.0 é uma aplicação de <strong>linha de comandos (CLI)</strong> que utiliza
+            <code>Scanner</code> para ler input do utilizador via terminal interativo (<strong>TTY</strong>).
+            <br><br>
+            Plataformas de cloud como o Render executam contentores em modo <strong>não interativo</strong>
+            — sem terminal TTY — o que impede a leitura de comandos do utilizador. Por este motivo,
+            o contentor arranca, mostra o menu do jogo nos logs, e termina com erro
+            <code>NoSuchElementException</code> ao tentar ler o primeiro comando.
+            <br><br>
+            <strong>Isto não é um bug da aplicação</strong> — é uma limitação arquitetural das plataformas
+            de hosting web para aplicações CLI interativas. O jogo funciona corretamente quando executado
+            localmente com <code>docker run -it</code> (flag <code>-it</code> ativa o modo interativo com TTY).
+            <br><br>
+            Para uma futura versão web seria necessário reimplementar a interface usando WebSockets
+            ou uma API REST, substituindo o <code>Scanner</code> por um servidor HTTP.
+        </div>
+    </section>
+
     <section id="roadmap">
         <h2>🗺 Roadmap</h2>
         <ul class="roadmap-list">
@@ -485,7 +569,11 @@ java -jar target/BattleshipGamePlayer-2.0.jar</pre>
             <li><span class="check-done">✅</span> Integração com LLM (Hugging Face)</li>
             <li><span class="check-done">✅</span> Pipeline CI/CD com GitHub Actions</li>
             <li><span class="check-done">✅</span> Containerização com Docker</li>
-            <li><span class="check-done">✅</span> DevContainer para desenvolvimento</li>
+            <li><span class="check-done">✅</span> Publicação automática no Docker Hub</li>
+            <li><span class="check-done">✅</span> Deploy na nuvem (Render)</li>
+            <li><span class="check-done">✅</span> DevContainer para desenvolvimento padronizado</li>
+            <li><span class="check-done">✅</span> Modo headless para ambiente Docker/CI</li>
+            <li><span class="check-todo">⬜</span> Interface web (WebSockets/REST)</li>
             <li><span class="check-todo">⬜</span> Adicionar efeitos sonoros (SFX)</li>
             <li><span class="check-todo">⬜</span> Mecânica "Fog of War"</li>
             <li><span class="check-todo">⬜</span> Integração multijogador (Alta Prioridade)</li>
