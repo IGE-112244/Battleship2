@@ -34,8 +34,16 @@ de hosting web para aplicações CLI interativas. O jogo funciona
 corretamente com `docker run -it` (a flag `-it` ativa o modo 
 interativo com TTY).
 
-**Por este motivo, apesar de termos trocado URL com os nossos colegas, e como os colegas têm a mesma limitação, não é possível fazer os passos 5 para a frente, da Parte I.**
-
+**Nota académica:** Por este motivo, apesar de termos trocado o URL com 
+> os colegas de outro grupo, e como esses colegas têm a mesma limitação 
+> arquitetural, não foi possível realizar os passos 5 e seguintes da Parte I 
+> do enunciado (testes inter-grupos e submissão de Issues).
+>
+> No entanto, para o objetivo principal e motivo de avaliação deste guião, 
+> a experiência foi muito enriquecedora, ficámos a perceber bem como utilizar 
+> o **Docker** e os **contentores** para automatizar o processo de deploy, 
+> garantir ambientes isolados e reproduzíveis, e integrar tudo numa pipeline 
+> de **CI/CD** completa com GitHub Actions.
 
 ## Vídeo de Demonstração
 https://youtu.be/-CgKMK2VNCU
