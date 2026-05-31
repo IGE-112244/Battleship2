@@ -3,6 +3,7 @@
   "build": {
     "dockerfile": "Dockerfile"
   },
+  "workspaceFolder": "/IdeaProjects/Battleship2",
   "customizations": {
     "vscode": {
       "extensions": [
