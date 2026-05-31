@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.jetbrains.annotations.NotNull;
 import java.util.logging.Logger;
-import java.awt.GraphicsEnvironment;
+import java.awt.GraphicsEnvironment;IA
 
 import java.util.*;
 
@@ -78,6 +78,109 @@ public class Game implements IGame
 
 		printLegend(showLegend);
 		LOGGER.info("");
+	}
+
+	/**
+	 * Imprime os dois tabuleiros lado a lado em modo headless (Docker/CI).
+	 * Esquerda: o teu tabuleiro. Direita: o tabuleiro da IA.
+	 */
+	public static void printBothBoardsHeadless(IFleet myFleet,
+	                                           List<IMove> alienMoves,
+	                                           List<IMove> myMoves,
+	                                           boolean showShots) {
+		char[][] myMap = new char[BOARD_SIZE][BOARD_SIZE];
+		char[][] aiMap = new char[BOARD_SIZE][BOARD_SIZE];
+
+		// Inicializar mapas
+		for (int r = 0; r < BOARD_SIZE; r++)
+			for (int c = 0; c < BOARD_SIZE; c++) {
+				myMap[r][c] = EMPTY_MARKER;
+				aiMap[r][c] = EMPTY_MARKER;
+			}
+
+		// Preencher o teu tabuleiro
+		fillMap(myFleet, myMap);
+		if (showShots)
+			for (IMove move : alienMoves)
+				for (IPosition shot : move.getShots())
+					if (shot.isInside()) {
+						int r = shot.getRow();
+						int c = shot.getColumn();
+						if (myMap[r][c] == SHIP_MARKER)
+							myMap[r][c] = SHOT_SHIP_MARKER;
+						else if (myMap[r][c] == EMPTY_MARKER ||
+								myMap[r][c] == SHIP_ADJACENT_MARKER)
+							myMap[r][c] = SHOT_WATER_MARKER;
+					}
+
+		// Preencher tabuleiro da IA com os teus tiros
+		if (myMoves != null)
+			for (IMove move : myMoves) {
+				List<IPosition> shots = move.getShots();
+				List<IGame.ShotResult> results = move.getShotResults();
+				for (int i = 0; i < shots.size(); i++) {
+					IPosition pos = shots.get(i);
+					if (!pos.isInside()) continue;
+					int r = pos.getRow();
+					int c = pos.getColumn();
+					if (i < results.size()) {
+						IGame.ShotResult result = results.get(i);
+						if (!result.valid() || result.repeated()) continue;
+						aiMap[r][c] = (result.ship() != null)
+								? SHOT_SHIP_MARKER : SHOT_WATER_MARKER;
+					}
+				}
+			}
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("\n");
+
+		// Títulos
+		sb.append("  === O TEU TABULEIRO ===          ");
+		sb.append("=== TABULEIRO DA IA ===\n");
+
+		// Cabeçalho colunas
+		sb.append("     ");
+		for (int c = 0; c < BOARD_SIZE; c++)
+			sb.append(String.format("%2d", c + 1));
+		sb.append("          ");
+		for (int c = 0; c < BOARD_SIZE; c++)
+			sb.append(String.format("%2d", c + 1));
+		sb.append("\n");
+
+		// Linha superior
+		sb.append("   +-").append("--".repeat(BOARD_SIZE)).append("+");
+		sb.append("     ");
+		sb.append("+-").append("--".repeat(BOARD_SIZE)).append("+\n");
+
+		// Linhas dos tabuleiros lado a lado
+		for (int row = 0; row < BOARD_SIZE; row++) {
+			char rowLabel = new Position(row, 0).getClassicRow();
+
+			// Teu tabuleiro
+			sb.append(" ").append(rowLabel).append(" |");
+			for (int col = 0; col < BOARD_SIZE; col++)
+				sb.append(" ").append(myMap[row][col]);
+			sb.append(" |");
+
+			sb.append("     ");
+
+			// Tabuleiro da IA
+			sb.append(" ").append(rowLabel).append(" |");
+			for (int col = 0; col < BOARD_SIZE; col++)
+				sb.append(" ").append(aiMap[row][col]);
+			sb.append(" |\n");
+		}
+
+		// Linha inferior
+		sb.append("   +").append("--".repeat(BOARD_SIZE)).append("-+");
+		sb.append("     ");
+		sb.append("+").append("--".repeat(BOARD_SIZE)).append("-+\n");
+
+		// Legenda
+		sb.append("\n  # navio  * acerto  o água  . vazio\n");
+
+		System.out.print(sb);
 	}
 
 	/**

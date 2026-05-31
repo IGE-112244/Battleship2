@@ -29,6 +29,8 @@ public class BoardVisualizer {
     // Offset horizontal do tabuleiro da IA (à direita)
     private static final int RIGHT_BOARD_OFFSET = 26;
 
+
+
     /**
      * Inicializa a janela gráfica.
      */
@@ -56,6 +58,12 @@ public class BoardVisualizer {
      */
     public static void atualizar(IFleet myFleet, List<IMove> alienMoves,
                                  List<IMove> myMoves, boolean showShots) {
+        if (GraphicsEnvironment.isHeadless()) {
+            Game.printBothBoardsHeadless(myFleet, alienMoves,
+                    myMoves, showShots);
+            return;
+        }
+
         if (screen == null) return;
 
         try {
