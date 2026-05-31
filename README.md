@@ -243,6 +243,49 @@ Este repositório utiliza GitHub Actions para automatizar a execução dos teste
 - Verifica o output do step **Build and run unit tests with Maven**
 - Os relatórios detalhados estão disponíveis em **Artifacts → test-results**
 
+- ## Respostas à Ficha 6
+
+- ## ⚠️ Nota sobre o comando `iajogo2p` em ambiente Docker/DevContainer
+
+O comando `iajogo2p` requer um token de autenticação do Hugging Face (`HF_TOKEN`)
+para comunicar com o modelo de linguagem (LLM) utilizado como adversário da IA.
+
+### Por que não funciona automaticamente no DevContainer?
+
+O token está armazenado nos **GitHub Secrets** do repositório, que por razões de
+segurança do GitHub **não são acessíveis fora de workflows de GitHub Actions**.
+Adicionalmente, o ficheiro `config.properties` que contém o token localmente
+está incluído no `.gitignore` para evitar a exposição acidental do token num
+repositório público.
+
+### Como ativar o `iajogo2p` no DevContainer
+
+Para utilizar este comando, crie manualmente o ficheiro `config.properties`
+na raiz do projeto dentro do contentor com o seguinte conteúdo:
+
+HF_TOKEN=<o_seu_token_do_hugging_face>
+
+O token pode ser obtido gratuitamente em: https://huggingface.co/settings/tokens
+
+### Funcionalidades completamente operacionais no DevContainer
+
+Todos os restantes comandos funcionam sem qualquer configuração adicional:
+
+| Comando | Descrição |
+|---|---|
+| `gerafrota` | Gera uma frota aleatória |
+| `lefrota` | Carrega uma frota personalizada |
+| `estado` | Mostra o estado da frota |
+| `mapa` | Exibe o mapa do jogo |
+| `rajada` | Realiza uma rajada de disparos |
+| `rajadajson` | Insere uma rajada em formato JSON |
+| `simula` | Simula um jogo completo |
+| `tiros` | Lista os tiros realizados |
+| `stats` | Mostra as estatísticas |
+| `resetstats` | Apaga as estatísticas |
+| `exportjson` | Exporta o histórico em JSON |
+| `desisto` | Encerra o jogo |
+
 ## 📖 Table of Contents
 - [Project Overview](#-project-overview)
 - [Key Features](#-key-features)
