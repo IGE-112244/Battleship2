@@ -1,0 +1,1 @@
+memberSearchIndex = [{"p":"battleship","c":"ExitException","l":"ExitException(int)","u":"%3Cinit%3E(int)"},{"p":"battleship","c":"ExitException","l":"status"}];updateSearchResults();
