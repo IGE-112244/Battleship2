@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.jetbrains.annotations.NotNull;
 import java.util.logging.Logger;
+import java.awt.GraphicsEnvironment;
 
 import java.util.*;
 
@@ -77,6 +78,73 @@ public class Game implements IGame
 
 		printLegend(showLegend);
 		LOGGER.info("");
+	}
+
+	/**
+	 * Imprime o tabuleiro formatado no terminal em modo headless (Docker/CI).
+	 * Mostra o tabuleiro como uma grelha completa em vez de uma linha por célula.
+	 */
+	public static void printBoardHeadless(IFleet fleet, List<IMove> moves,
+	                                      boolean showShots, boolean showLegend) {
+		if (fleet == null) throw new IllegalArgumentException("fleet must not be null");
+		if (moves == null) throw new IllegalArgumentException("moves must not be null");
+
+		char[][] map = new char[BOARD_SIZE][BOARD_SIZE];
+		fillMap(fleet, map);
+
+		if (showShots)
+			for (IMove move : moves)
+				for (IPosition shot : move.getShots())
+					if (shot.isInside()) {
+						int row = shot.getRow();
+						int col = shot.getColumn();
+						if (map[row][col] == SHIP_MARKER)
+							map[row][col] = SHOT_SHIP_MARKER;
+						if (map[row][col] == EMPTY_MARKER ||
+								map[row][col] == SHIP_ADJACENT_MARKER)
+							map[row][col] = SHOT_WATER_MARKER;
+					}
+
+		StringBuilder sb = new StringBuilder();
+
+		// Cabeçalho das colunas
+		sb.append("\n     ");
+		for (int col = 0; col < BOARD_SIZE; col++)
+			sb.append(String.format("%2d", col + 1));
+		sb.append("\n");
+
+		// Linha superior
+		sb.append("   +-");
+		sb.append("--".repeat(BOARD_SIZE));
+		sb.append("+\n");
+
+		// Linhas do tabuleiro
+		for (int row = 0; row < BOARD_SIZE; row++) {
+			char rowLabel = new Position(row, 0).getClassicRow();
+			sb.append(" ").append(rowLabel).append(" |");
+			for (int col = 0; col < BOARD_SIZE; col++)
+				sb.append(" ").append(map[row][col]);
+			sb.append(" |\n");
+		}
+
+		// Linha inferior
+		sb.append("   +");
+		sb.append("--".repeat(BOARD_SIZE));
+		sb.append("-+\n");
+
+		// Legenda
+		if (showLegend) {
+			sb.append("\n          LEGENDA\n");
+			sb.append("'").append(SHIP_MARKER)
+					.append("'->navio, '").append(SHIP_ADJACENT_MARKER)
+					.append("'->adjacente a navio, '").append(EMPTY_MARKER)
+					.append("'->água\n");
+			sb.append("'").append(SHOT_SHIP_MARKER)
+					.append("'->Tiro certeiro, '").append(SHOT_WATER_MARKER)
+					.append("'->Tiro na água\n");
+		}
+
+		System.out.print(sb);
 	}
 
 	private static void printLegend(boolean showLegend) {
@@ -441,9 +509,15 @@ public class Game implements IGame
 		return false;
 	}
 
-	public void printMyBoard(boolean showShots, boolean showLegend)
-	{
-		Game.printBoard(this.myFleet, this.alienMoves, showShots, showLegend);
+	public void printMyBoard(boolean showShots, boolean showLegend) {
+		if (GraphicsEnvironment.isHeadless() ||
+				System.getenv("DOCKER_ENV") != null) {
+			Game.printBoardHeadless(this.myFleet, this.alienMoves,
+					showShots, showLegend);
+		} else {
+			Game.printBoard(this.myFleet, this.alienMoves,
+					showShots, showLegend);
+		}
 	}
 
 	public void printAlienBoard(boolean showShots, boolean show_legend)
