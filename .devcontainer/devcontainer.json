@@ -11,8 +11,25 @@
         "github.vscode-github-actions",
         "yzhang.markdown-all-in-one"
       ]
+    },
+    "jetbrains": {
+      "backend": "IntelliJIdea",
+      "plugins": [
+        "Docker",
+        "org.jetbrains.plugins.github"
+      ],
+      "projectSettings": {
+        "jdk": {
+          "name": "corretto-21",
+          "homePath": "/usr/lib/jvm/java-21-amazon-corretto"
+        }
+      }
     }
   },
   "postCreateCommand": "mvn clean compile",
-  "remoteUser": "root"
+  "remoteUser": "root",
+  "remoteEnv": {
+    "JAVA_HOME": "/usr/lib/jvm/java-21-amazon-corretto",
+    "PATH": "/usr/lib/jvm/java-21-amazon-corretto/bin:${containerEnv:PATH}"
+  }
 }
