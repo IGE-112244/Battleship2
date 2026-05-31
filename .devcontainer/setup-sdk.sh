@@ -43,9 +43,9 @@ EOF
 
 echo "SDK corretto-21 configurado com sucesso!"
 
-# Forçar import do Maven no IntelliJ
-echo "A configurar Maven import automático..."
+# Configurar ficheiros do IntelliJ
 mkdir -p /IdeaProjects/Battleship2/.idea
+
 cat > /IdeaProjects/Battleship2/.idea/compiler.xml << 'EOF'
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
@@ -55,7 +55,25 @@ cat > /IdeaProjects/Battleship2/.idea/compiler.xml << 'EOF'
 </project>
 EOF
 
-# Resolver dependências e compilar
+cat > /IdeaProjects/Battleship2/.idea/maven.xml << 'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="MavenProjectsManager">
+    <option name="originalFiles">
+      <list>
+        <option value="$PROJECT_DIR$/pom.xml" />
+      </list>
+    </option>
+    <option name="importingSettings">
+      <MavenImportingSettings>
+        <option name="importAutomatically" value="true" />
+        <option name="downloadSourcesAutomatically" value="false" />
+      </MavenImportingSettings>
+    </option>
+  </component>
+</project>
+EOF
+
 echo "A resolver dependências Maven..."
 mvn -f /IdeaProjects/Battleship2/pom.xml dependency:resolve -q && \
     echo "Dependências resolvidas!"
