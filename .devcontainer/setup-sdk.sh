@@ -43,5 +43,23 @@ EOF
 
 echo "SDK corretto-21 configurado com sucesso!"
 
-# Compilar o projeto
-mvn clean compile -q && echo "BUILD SUCCESS" || echo "BUILD FAILED"
+# Forçar import do Maven no IntelliJ
+echo "A configurar Maven import automático..."
+mkdir -p /IdeaProjects/Battleship2/.idea
+cat > /IdeaProjects/Battleship2/.idea/compiler.xml << 'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <option name="DEFAULT_COMPILER" value="Javac" />
+  </component>
+</project>
+EOF
+
+# Resolver dependências e compilar
+echo "A resolver dependências Maven..."
+mvn -f /IdeaProjects/Battleship2/pom.xml dependency:resolve -q && \
+    echo "Dependências resolvidas!"
+
+echo "A compilar o projeto..."
+mvn -f /IdeaProjects/Battleship2/pom.xml clean compile -q && \
+    echo "BUILD SUCCESS" || echo "BUILD FAILED"
