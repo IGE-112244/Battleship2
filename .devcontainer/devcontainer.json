@@ -27,6 +27,7 @@
     }
   },
   "postCreateCommand": "git config --global --add safe.directory /IdeaProjects/Battleship2 && mvn clean compile -q",
+  "postStartCommand": "cd /IdeaProjects/Battleship2 && mvn clean compile -q",
   "remoteEnv": {
     "JAVA_HOME": "/usr/lib/jvm/java-21-amazon-corretto",
     "PATH": "/usr/lib/jvm/java-21-amazon-corretto/bin:${containerEnv:PATH}",
