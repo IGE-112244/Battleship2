@@ -3,6 +3,7 @@
   "build": {
     "dockerfile": "Dockerfile"
   },
+  "workspaceFolder": "/IdeaProjects/Battleship2",
   "customizations": {
     "vscode": {
       "extensions": [
@@ -12,6 +13,6 @@
       ]
     }
   },
-  "postCreateCommand": "mvn clean compile -DskipTests",
+  "postCreateCommand": "mvn clean compile",
   "remoteUser": "root"
 }
