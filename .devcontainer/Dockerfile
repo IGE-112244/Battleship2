@@ -2,13 +2,14 @@ FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Instalar Java 21, Maven, Git
+# Instalar dependências base incluindo gnupg
 RUN apt-get update && apt-get install -y \
     wget \
     tar \
     git \
     curl \
     ca-certificates \
+    gnupg \
     && apt-get clean
 
 # Instalar Amazon Corretto 21
