@@ -1,5 +1,7 @@
 FROM amazoncorretto:21-al2023
 
+ENV JAVA_TOOL_OPTIONS=""
+
 RUN yum install -y wget tar git && \
     yum clean all
 
@@ -13,6 +15,10 @@ RUN wget https://archive.apache.org/dist/maven/maven-3/${MAVEN_VERSION}/binaries
 ENV MAVEN_HOME=/opt/maven
 ENV PATH=${MAVEN_HOME}/bin:${PATH}
 ENV JAVA_HOME=/usr/lib/jvm/java-21-amazon-corretto
+ENV JAVA_TOOL_OPTIONS=""
+
+RUN echo 'unset JAVA_TOOL_OPTIONS' >> /etc/profile
+RUN echo 'unset JAVA_TOOL_OPTIONS' >> /root/.bashrc
 
 RUN java -version && mvn -version && git --version
 
