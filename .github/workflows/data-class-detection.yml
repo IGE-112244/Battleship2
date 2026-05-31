@@ -3,6 +3,8 @@
 # Critério: WOC < 0.33 e NOPA >= 3 e NOAM >= 3 (Object-Oriented Metrics in Practice, Lanza & Marinescu)
 # Ferramenta: Qodana for JVM
 name: Data Class Detection - Quality Gate
+permissions:
+  contents: read
 on:
   push:
     branches: [ main, master ]

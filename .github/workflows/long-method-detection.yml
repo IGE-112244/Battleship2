@@ -6,6 +6,9 @@
 
 name: Long Method Detection - Quality Gate
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ main, master ]
