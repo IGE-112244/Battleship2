@@ -3,6 +3,7 @@ package battleship;
 import org.jetbrains.annotations.NotNull;
 import org.knowm.xchart.*;
 import org.knowm.xchart.style.Styler;
+import java.awt.GraphicsEnvironment;
 
 import javax.swing.*;
 import java.awt.*;
