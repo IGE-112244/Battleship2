@@ -1,6 +1,42 @@
 ## URL
 https://battleship-game-latest.onrender.com
 
+## 🌐 Distribuição e Deploy
+
+### Docker Hub
+A imagem Docker é publicada automaticamente no Docker Hub a cada push 
+para o branch `main` via GitHub Actions:
+
+docker pull carol123456/battleship-game:latest
+docker run -it carol123456/battleship-game:latest
+
+🔗 https://hub.docker.com/r/carol123456/battleship-game
+
+---
+
+### Deploy na Nuvem (Render)
+O contentor está disponível publicamente em:
+🔗 https://battleship-game-latest.onrender.com
+
+### ⚠️ Porquê o link não permite jogar no browser?
+
+O Battleship 2.0 é uma aplicação de **linha de comandos (CLI)** que 
+utiliza `Scanner` para ler input do utilizador via terminal interativo (TTY).
+
+Plataformas de cloud como o Render executam contentores em modo 
+**não interativo** — sem terminal TTY — o que impede a leitura de 
+comandos do utilizador. O contentor arranca, mostra o menu do jogo 
+nos logs, e termina com `NoSuchElementException` ao tentar ler o 
+primeiro comando.
+
+**Isto não é um bug** — é uma limitação arquitetural das plataformas 
+de hosting web para aplicações CLI interativas. O jogo funciona 
+corretamente com `docker run -it` (a flag `-it` ativa o modo 
+interativo com TTY).
+
+**Por este motivo, apesar de termos trocado URL com os nossos colegas, e como os colegas têm a mesma limitação, não é possível fazer os passos 5 para a frente, da Parte I.**
+
+
 ## Vídeo de Demonstração
 https://youtu.be/-CgKMK2VNCU
 
