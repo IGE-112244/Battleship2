@@ -27,7 +27,6 @@
     }
   },
   "postCreateCommand": "mvn clean compile",
-  "remoteUser": "root",
   "remoteEnv": {
     "JAVA_HOME": "/usr/lib/jvm/java-21-amazon-corretto",
     "PATH": "/usr/lib/jvm/java-21-amazon-corretto/bin:${containerEnv:PATH}"
