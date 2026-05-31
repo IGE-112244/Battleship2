@@ -35,7 +35,7 @@ corretamente com `docker run -it` (a flag `-it` ativa o modo
 interativo com TTY).
 
 **Nota académica:** Por este motivo, apesar de termos trocado o URL com 
-> os colegas de outro grupo, e como esses colegas têm a mesma limitação 
+> os colegas de outro grupo ( https://battleship-game-2.onrender.com ), e como esses colegas têm a mesma limitação 
 > arquitetural, não foi possível realizar os passos 5 e seguintes da Parte I 
 > do enunciado (testes inter-grupos e submissão de Issues).
 >
