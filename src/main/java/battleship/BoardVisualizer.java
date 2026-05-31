@@ -32,6 +32,10 @@ public class BoardVisualizer {
      * Inicializa a janela gráfica.
      */
     public static void iniciar() {
+        if (GraphicsEnvironment.isHeadless()) {
+            LOGGER.info("Modo headless — BoardVisualizer desativado.");
+            return;
+        }
         try {
             Terminal terminal = new DefaultTerminalFactory().createTerminal();
             screen = new TerminalScreen(terminal);
@@ -212,13 +216,12 @@ public class BoardVisualizer {
      * Fecha a janela gráfica.
      */
     public static void fechar() {
-        if (screen != null) {
-            try {
-                screen.stopScreen();
-                screen = null;
-            } catch (IOException e) {
-                LOGGER.error("Erro ao fechar visualização: {}", e.getMessage());
-            }
+        if (screen == null) return;
+        try {
+            screen.stopScreen();
+            screen = null;
+        } catch (IOException e) {
+            LOGGER.error("Erro ao fechar visualização: {}", e.getMessage());
         }
     }
 }

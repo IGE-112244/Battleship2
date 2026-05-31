@@ -26,6 +26,21 @@ public class GameStatsPanel {
      * Se o painel já estiver aberto, fecha e reabre com dados atualizados.
      */
     public static void mostrar() {
+
+        // Verificar se está em modo headless
+        if (GraphicsEnvironment.isHeadless()) {
+            GameStats stats = GameStatsRepository.load();
+            System.out.println("\n📊 === ESTATÍSTICAS DO JOGADOR ===");
+            System.out.println("🎮 Jogos Realizados: " + stats.getTotalJogos());
+            System.out.println("🏆 Jogos Ganhos:     " + stats.getJogosGanhos());
+            System.out.println("🎯 Precisão:         " +
+                    String.format("%.1f%%", stats.getAccuracy()));
+            System.out.println("💥 Total de Tiros:   " + stats.getTotalTiros());
+            System.out.println("✅ Tiros Acertados:  " + stats.getTirosAcertados());
+            System.out.println("=================================\n");
+            return;
+        }
+
         GameStats stats = GameStatsRepository.load();
 
         // Fechar janela anterior se existir
